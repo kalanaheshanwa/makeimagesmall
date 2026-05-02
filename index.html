@@ -167,7 +167,7 @@ footer a:hover{color:var(--text)}
   </div>
 
   <div class="drop-zone" id="dropZone">
-    <input type="file" id="fileInput" multiple accept="image/*">
+    <input type="file" id="fileInput" multiple accept="image/*,.heic,.heif,.HEIC,.HEIF">
     <div class="dz-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
     <div class="dz-title">Drop your images here</div>
     <div class="dz-sub">or click to browse files from your computer</div>
@@ -175,7 +175,7 @@ footer a:hover{color:var(--text)}
       <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       Select images
     </button>
-    <div class="formats">Supports JPG · PNG · GIF · BMP · AVIF · TIFF · WebP</div>
+    <div class="formats">Supports JPG · PNG · GIF · BMP · AVIF · TIFF · WebP · <strong style="color:var(--brand)">HEIC/HEIF</strong> · and more</div>
   </div>
 
   <div class="controls">
@@ -278,6 +278,7 @@ footer a:hover{color:var(--text)}
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),qualitySlider=document.getElementById('qualitySlider'),qualityNum=document.getElementById('qualityNum');
@@ -308,10 +309,30 @@ function recompressAll(){
 }
 dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('over')});
 dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('over'));
-dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('over');const f=[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/'));if(f.length)handleFiles(f)});
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('over');const f=[...e.dataTransfer.files].filter(f=>isImageFile(f));if(f.length)handleFiles(f)});
 dropZone.addEventListener('click',e=>{if(!e.target.closest('button'))fileInput.click()});
 fileInput.addEventListener('change',()=>{if(fileInput.files.length)handleFiles([...fileInput.files])});
+
+function isImageFile(file){
+  if(file.type.startsWith('image/'))return true;
+  const ext=file.name.split('.').pop().toLowerCase();
+  return['heic','heif','jpg','jpeg','png','gif','bmp','webp','avif','tiff','tif','svg'].includes(ext);
+}
 function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(2)+' MB'}
+function isHeic(file){
+  return file.type==='image/heic'||file.type==='image/heif'||
+    ['heic','heif'].includes(file.name.split('.').pop().toLowerCase());
+}
+
+async function fileToImageBlob(file){
+  if(isHeic(file)){
+    // Use heic2any to convert HEIC → JPEG blob first
+    const converted = await heic2any({blob:file, toType:'image/jpeg', quality:0.95});
+    return Array.isArray(converted)?converted[0]:converted;
+  }
+  return file;
+}
+
 function handleFiles(files){
   originalFiles=[...originalFiles,...files].filter((f,i,a)=>a.findIndex(x=>x.name===f.name&&x.size===f.size)===i);
   resetQualityDesc();
@@ -322,36 +343,44 @@ function handleFiles(files){
   document.getElementById('progText').textContent='Compressing…';
   document.getElementById('resultsBar').style.display='flex';
   document.getElementById('summaryStrip').style.display='flex';
-  files.forEach(file=>{
+
+  files.forEach(async file=>{
     const id='fc-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
     document.getElementById('fileList').prepend(makeCard(file,id));
-    const reader=new FileReader();
-    reader.onload=evt=>{
-      const img=new Image();
-      img.onload=()=>{
-        try{
-          const canvas=document.createElement('canvas');
-          const MAX=16383;let w=img.naturalWidth,h=img.naturalHeight;
-          if(w>MAX||h>MAX){const s=Math.min(MAX/w,MAX/h);w=Math.floor(w*s);h=Math.floor(h*s)}
-          canvas.width=w;canvas.height=h;
-          canvas.getContext('2d').drawImage(img,0,0,w,h);
-          canvas.toBlob(blob=>{
-            if(!blob){cardError(id,'Unsupported format');done++;tick(done,total);return}
-            // Auto-protect: if WebP is larger than original, keep original
-            const useOriginal = blob.size >= file.size;
-            const finalBlob = useOriginal ? file : blob;
-            const outName = useOriginal ? file.name : file.name.replace(/\.[^.]+$/,'')+'.webp';
-            const url=URL.createObjectURL(finalBlob);
-            results.push({name:outName,blob:finalBlob,url});
-            totalBefore+=file.size;totalAfter+=finalBlob.size;doneCount++;done++;
-            tick(done,total);cardDone(id,file,finalBlob,url,outName,useOriginal);updateSummary();updateMeta();
-          },'image/webp',parseInt(qualitySlider.value)/100);
-        }catch(e){cardError(id,'Error: '+e.message);done++;tick(done,total)}
-      };
-      img.onerror=()=>{cardError(id,'Could not load image');done++;tick(done,total)};
-      img.src=evt.target.result;
-    };
-    reader.readAsDataURL(file);
+
+    try{
+      // Step 1: convert HEIC if needed
+      const processableBlob = await fileToImageBlob(file);
+
+      // Step 2: draw to canvas
+      const blobUrl = URL.createObjectURL(processableBlob);
+      const img = new Image();
+      await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=blobUrl;});
+      URL.revokeObjectURL(blobUrl);
+
+      const canvas=document.createElement('canvas');
+      const MAX=16383;let w=img.naturalWidth,h=img.naturalHeight;
+      if(w>MAX||h>MAX){const s=Math.min(MAX/w,MAX/h);w=Math.floor(w*s);h=Math.floor(h*s)}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+
+      // Step 3: encode to WebP
+      const blob = await new Promise(res=>canvas.toBlob(res,'image/webp',parseInt(qualitySlider.value)/100));
+      if(!blob)throw new Error('Encoding failed');
+
+      const useOriginal=blob.size>=file.size;
+      const finalBlob=useOriginal?file:blob;
+      const outName=useOriginal?file.name:file.name.replace(/\.[^.]+$/,'')+'.webp';
+      const url=URL.createObjectURL(finalBlob);
+      results.push({name:outName,blob:finalBlob,url});
+      totalBefore+=file.size;totalAfter+=finalBlob.size;doneCount++;done++;
+      tick(done,total);cardDone(id,file,finalBlob,url,outName,useOriginal);updateSummary();updateMeta();
+
+    }catch(err){
+      console.error(err);
+      const msg=isHeic(file)&&err.message?.includes('heic2any')?'HEIC not supported on this browser':'Could not process image';
+      cardError(id,msg);done++;tick(done,total);
+    }
   });
 }
 function tick(done,total){
