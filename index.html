@@ -159,10 +159,13 @@ footer a:hover{color:var(--text)}
   <div class="controls">
     <span class="ctrl-label">Quality</span>
     <div class="quality-wrap">
-      <input type="range" id="qualitySlider" min="10" max="100" value="82" step="1">
+      <input type="range" id="qualitySlider" min="10" max="90" value="82" step="1">
       <span class="quality-num" id="qualityNum">82</span>
     </div>
-    <span class="ctrl-desc">Higher = better quality, larger file. 80–85 is the sweet spot for most images.</span>
+    <div style="flex:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <span class="ctrl-desc" id="ctrlDesc">Higher = better quality, larger file. 80–85 is the sweet spot.</span>
+      <button id="recompressBtn" onclick="recompressAll()" style="display:none;padding:6px 14px;background:var(--brand);color:white;border:none;border-radius:var(--rs);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;">↺ Recompress all</button>
+    </div>
   </div>
 
   <div id="progressWrap">
@@ -230,7 +233,30 @@ footer a:hover{color:var(--text)}
 <script>
 const dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),qualitySlider=document.getElementById('qualitySlider'),qualityNum=document.getElementById('qualityNum');
 let results=[],totalBefore=0,totalAfter=0,doneCount=0;
-qualitySlider.addEventListener('input',()=>qualityNum.textContent=qualitySlider.value);
+let originalFiles=[];
+qualitySlider.addEventListener('input',()=>{
+  qualityNum.textContent=qualitySlider.value;
+  if(originalFiles.length>0){
+    document.getElementById('recompressBtn').style.display='inline-flex';
+    document.getElementById('ctrlDesc').textContent='Quality changed — click Recompress to apply to all images.';
+    document.getElementById('ctrlDesc').style.color='var(--warn)';
+  }
+});
+function resetQualityDesc(){
+  document.getElementById('recompressBtn').style.display='none';
+  document.getElementById('ctrlDesc').textContent='Higher = better quality, larger file. 80–85 is the sweet spot.';
+  document.getElementById('ctrlDesc').style.color='';
+}
+function recompressAll(){
+  if(!originalFiles.length)return;
+  results.forEach(f=>URL.revokeObjectURL(f.url));
+  results=[];totalBefore=0;totalAfter=0;doneCount=0;
+  document.getElementById('fileList').innerHTML='';
+  document.getElementById('summaryStrip').style.display='none';
+  document.getElementById('resultsBar').style.display='none';
+  resetQualityDesc();
+  handleFiles(originalFiles);
+}
 dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('over')});
 dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('over'));
 dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('over');const f=[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/'));if(f.length)handleFiles(f)});
@@ -238,6 +264,8 @@ dropZone.addEventListener('click',e=>{if(!e.target.closest('button'))fileInput.c
 fileInput.addEventListener('change',()=>{if(fileInput.files.length)handleFiles([...fileInput.files])});
 function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(2)+' MB'}
 function handleFiles(files){
+  originalFiles=[...originalFiles,...files].filter((f,i,a)=>a.findIndex(x=>x.name===f.name&&x.size===f.size)===i);
+  resetQualityDesc();
   const total=files.length;let done=0;
   document.getElementById('progressWrap').style.display='block';
   document.getElementById('progFill').style.width='0%';
@@ -260,11 +288,14 @@ function handleFiles(files){
           canvas.getContext('2d').drawImage(img,0,0,w,h);
           canvas.toBlob(blob=>{
             if(!blob){cardError(id,'Unsupported format');done++;tick(done,total);return}
-            const outName=file.name.replace(/\.[^.]+$/,'')+'.webp';
-            const url=URL.createObjectURL(blob);
-            results.push({name:outName,blob,url});
-            totalBefore+=file.size;totalAfter+=blob.size;doneCount++;done++;
-            tick(done,total);cardDone(id,file,blob,url,outName);updateSummary();updateMeta();
+            // Auto-protect: if WebP is larger than original, keep original
+            const useOriginal = blob.size >= file.size;
+            const finalBlob = useOriginal ? file : blob;
+            const outName = useOriginal ? file.name : file.name.replace(/\.[^.]+$/,'')+'.webp';
+            const url=URL.createObjectURL(finalBlob);
+            results.push({name:outName,blob:finalBlob,url});
+            totalBefore+=file.size;totalAfter+=finalBlob.size;doneCount++;done++;
+            tick(done,total);cardDone(id,file,finalBlob,url,outName,useOriginal);updateSummary();updateMeta();
           },'image/webp',parseInt(qualitySlider.value)/100);
         }catch(e){cardError(id,'Error: '+e.message);done++;tick(done,total)}
       };
@@ -286,10 +317,13 @@ function makeCard(file,id){
   d.innerHTML=`<img class="fc-thumb" src="${t}" alt=""><div><div class="fc-name">${file.name}</div><div class="fc-meta"><span>${fmt(file.size)}</span><span style="color:#d1d5db">→</span><span style="color:#9ca3af">compressing…</span></div></div><div class="fc-actions"><div class="spin"></div></div>`;
   return d;
 }
-function cardDone(id,orig,blob,url,outName){
+function cardDone(id,orig,blob,url,outName,keptOriginal){
   const c=document.getElementById(id);if(!c)return;c.classList.add('done');
   const saved=Math.round((orig.size-blob.size)/orig.size*100),smaller=blob.size<orig.size;
-  c.innerHTML=`<img class="fc-thumb" src="${url}" alt=""><div><div class="fc-name">${outName}</div><div class="fc-meta"><span>${fmt(orig.size)}</span><span style="color:#d1d5db">→</span><span class="sz-after">${fmt(blob.size)}</span><span class="save-pill ${smaller?'':'up'}">${smaller?'-':'+'}${Math.abs(saved)}%</span></div></div><div class="fc-actions"><button class="btn-save" onclick="dl('${url}','${outName}')">Save</button><div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>`;
+  const badge = keptOriginal
+    ? `<span class="save-pill" style="background:#fef9c3;color:#854d0e">kept original</span>`
+    : `<span class="save-pill ${smaller?'':'up'}">${smaller?'-':'+'}${Math.abs(saved)}%</span>`;
+  c.innerHTML=`<img class="fc-thumb" src="${url}" alt=""><div><div class="fc-name">${outName}</div><div class="fc-meta"><span>${fmt(orig.size)}</span><span style="color:#d1d5db">→</span><span class="sz-after">${fmt(blob.size)}</span>${badge}</div></div><div class="fc-actions"><button class="btn-save" onclick="dl('${url}','${outName}')">Save</button><div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>`;
 }
 function cardError(id,msg){const c=document.getElementById(id);if(!c)return;c.classList.add('error');c.querySelector('.fc-meta').innerHTML=`<span style="color:#ef4444">${msg}</span>`;c.querySelector('.fc-actions').innerHTML=`<span style="color:#ef4444;font-size:18px">✕</span>`}
 function updateSummary(){
@@ -314,7 +348,7 @@ async function downloadAll(){
   btn.disabled=false;resetDlBtn();
 }
 function resetDlBtn(){document.getElementById('dlAllBtn').innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" stroke="white" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download all'}
-function clearAll(){results.forEach(f=>URL.revokeObjectURL(f.url));results=[];totalBefore=0;totalAfter=0;doneCount=0;document.getElementById('fileList').innerHTML='';document.getElementById('resultsBar').style.display='none';document.getElementById('summaryStrip').style.display='none';document.getElementById('progressWrap').style.display='none';fileInput.value=''}
+function clearAll(){results.forEach(f=>URL.revokeObjectURL(f.url));results=[];originalFiles=[];totalBefore=0;totalAfter=0;doneCount=0;document.getElementById('fileList').innerHTML='';document.getElementById('resultsBar').style.display='none';document.getElementById('summaryStrip').style.display='none';document.getElementById('progressWrap').style.display='none';resetQualityDesc();fileInput.value=''}
 
 // Load blog preview
 fetch('/blog/posts.json').then(r=>r.json()).then(posts=>{
