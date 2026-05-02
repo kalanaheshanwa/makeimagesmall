@@ -9,14 +9,18 @@
 <meta property="og:description" content="Compress images free. No upload, no account, no limits. Files never leave your device.">
 <meta property="og:type" content="website">
 <link rel="canonical" href="https://makeimagesmall.com/">
+
 <!-- Google Analytics 4 — paste your GA4 tag here -->
 <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script> -->
+
 <!-- Google AdSense — paste your AdSense auto-ads tag here after approval -->
 <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebApplication","name":"MakeImageSmall — Free Image Compressor","url":"https://makeimagesmall.com","description":"Free online image compressor. Reduces JPG, PNG, GIF file sizes by converting to WebP format. No file uploads required.","applicationCategory":"UtilitiesApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
 </script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -74,11 +78,11 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;hei
 .sum-val{font-size:18px;font-weight:600;color:var(--green)}
 .sum-lbl{font-size:11px;color:var(--sub);text-transform:uppercase;letter-spacing:.05em}
 #fileList{display:flex;flex-direction:column;gap:8px}
-.fc{background:var(--white);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;box-shadow:var(--shadow);transition:border-color .2s}
+.fc{background:var(--white);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center;box-shadow:var(--shadow);transition:border-color .2s}
 .fc.done{border-color:#bbf7d0}
 .fc.error{border-color:#fca5a5}
 .fc-thumb{width:52px;height:40px;object-fit:cover;border-radius:6px;background:var(--bg);border:1px solid var(--border)}
-.fc-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px}
+.fc-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px;max-width:100%}
 .fc-meta{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--sub);flex-wrap:wrap}
 .sz-after{color:var(--green);font-weight:500}
 .save-pill{font-size:11px;font-weight:600;padding:2px 7px;border-radius:100px;background:var(--green-mid);color:var(--green)}
@@ -135,7 +139,10 @@ footer a:hover{color:var(--text)}
     </div>
   </div>
 
-  <div class="ad-slot"><!-- Google AdSense ad unit — paste here --></div>
+  <!-- Ad slot top -->
+  <div class="ad-slot">
+    <!-- Google AdSense ad unit — paste here -->
+  </div>
 
   <div class="drop-zone" id="dropZone">
     <input type="file" id="fileInput" multiple accept="image/*">
@@ -155,7 +162,7 @@ footer a:hover{color:var(--text)}
       <input type="range" id="qualitySlider" min="10" max="100" value="82" step="1">
       <span class="quality-num" id="qualityNum">82</span>
     </div>
-    <span class="ctrl-desc">Higher = better quality, larger file. 80–85 is the sweet spot.</span>
+    <span class="ctrl-desc">Higher = better quality, larger file. 80–85 is the sweet spot for most images.</span>
   </div>
 
   <div id="progressWrap">
@@ -183,8 +190,12 @@ footer a:hover{color:var(--text)}
 
   <div id="fileList"></div>
 
-  <div class="ad-slot"><!-- Google AdSense ad unit — paste here --></div>
+  <!-- Ad slot middle -->
+  <div class="ad-slot">
+    <!-- Google AdSense ad unit — paste here -->
+  </div>
 
+  <!-- Blog preview — loads latest 3 posts from blog/posts.json -->
   <div class="blog-section">
     <h2>Image optimization guides</h2>
     <div class="blog-grid" id="blogPreview">
@@ -199,9 +210,9 @@ footer a:hover{color:var(--text)}
     <div class="faq-item"><div class="faq-q">Are my images uploaded to a server?</div><div class="faq-a">No. Everything runs inside your browser. Your images are never sent to any server — complete privacy, and faster processing since there's no upload time.</div></div>
     <div class="faq-item"><div class="faq-q">What image formats are supported?</div><div class="faq-a">You can compress JPG/JPEG, PNG, GIF, BMP, AVIF, TIFF, and WebP. All files are converted to WebP for maximum compression.</div></div>
     <div class="faq-item"><div class="faq-q">How much will it reduce my file size?</div><div class="faq-a">Typical results: JPG compresses 30–50%, PNG compresses 50–80%, GIF compresses 40–60%. Results vary by image content and your quality setting.</div></div>
-    <div class="faq-item"><div class="faq-q">Will images lose quality after compression?</div><div class="faq-a">At the default quality of 82, the difference is invisible to the human eye. Anything above 75 is considered high quality for web use.</div></div>
+    <div class="faq-item"><div class="faq-q">Will images lose quality after compression?</div><div class="faq-a">At the default quality setting of 82, the difference is invisible to the human eye. You can adjust the slider — anything above 75 is considered high quality for web use.</div></div>
     <div class="faq-item"><div class="faq-q">Is there a limit on how many images I can compress?</div><div class="faq-a">No limit. Compress as many images as you need in one batch, for free, forever.</div></div>
-    <div class="faq-item"><div class="faq-q">Why use WebP instead of JPG or PNG?</div><div class="faq-a">WebP is supported by all modern browsers and provides significantly better compression. Smaller images = faster websites, better Google rankings, and lower bandwidth costs.</div></div>
+    <div class="faq-item"><div class="faq-q">Why use WebP instead of JPG or PNG?</div><div class="faq-a">WebP is supported by all modern browsers and provides significantly better compression. Smaller images = faster websites, better Google Core Web Vitals, and lower bandwidth costs.</div></div>
     <div class="faq-item"><div class="faq-q">Is this tool really free?</div><div class="faq-a">Yes, completely free. No subscription, no account, no watermarks, no limits. The tool is supported by ads.</div></div>
   </div>
 </main>
@@ -304,13 +315,15 @@ async function downloadAll(){
 }
 function resetDlBtn(){document.getElementById('dlAllBtn').innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" stroke="white" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download all'}
 function clearAll(){results.forEach(f=>URL.revokeObjectURL(f.url));results=[];totalBefore=0;totalAfter=0;doneCount=0;document.getElementById('fileList').innerHTML='';document.getElementById('resultsBar').style.display='none';document.getElementById('summaryStrip').style.display='none';document.getElementById('progressWrap').style.display='none';fileInput.value=''}
+
+// Load blog preview
 fetch('/blog/posts.json').then(r=>r.json()).then(posts=>{
   const recent=posts.slice(-3).reverse();
-  document.getElementById('blogPreview').innerHTML=recent.length?recent.map(p=>`
+  document.getElementById('blogPreview').innerHTML=recent.map(p=>`
     <a href="/blog/${p.slug}.html" class="blog-card">
       <div class="blog-card-title">${p.title}</div>
       <div class="blog-card-meta">${p.date}</div>
-    </a>`).join(''):'';
+    </a>`).join('');
 }).catch(()=>{document.getElementById('blogPreview').innerHTML=''});
 </script>
 </body>
