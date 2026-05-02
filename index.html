@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Compression Blog — Tips, Guides & WebP Tutorials | MakeImageSmall</title>
+<meta name="description" content="Free guides on image compression, WebP conversion, website speed optimization, and reducing image file sizes for better SEO and performance.">
+<link rel="canonical" href="https://makeimagesmall.com/blog/">
+<!-- Google Analytics 4 — paste your GA4 tag here -->
+<!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XXXXXXXXXX');</script> -->
+<!-- Google AdSense -->
+<!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--brand:#2563eb;--brand-light:#eff6ff;--green:#16a34a;--green-mid:#dcfce7;--text:#111827;--sub:#6b7280;--border:#e5e7eb;--bg:#f9fafb;--white:#fff;--r:12px;--rs:8px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.6}
+header{background:var(--white);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:17px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo-icon{width:28px;height:28px;background:var(--brand);border-radius:7px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:15px;height:15px;stroke:white;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nav-link{font-size:13px;color:var(--sub);text-decoration:none;font-weight:500;margin-left:16px}
+.nav-link:hover{color:var(--text)}
+main{max-width:760px;margin:0 auto;padding:40px 20px 80px}
+h1{font-size:28px;font-weight:600;letter-spacing:-.02em;margin-bottom:8px}
+.page-sub{font-size:15px;color:var(--sub);margin-bottom:32px}
+.blog-grid{display:grid;gap:12px}
+.blog-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;text-decoration:none;color:var(--text);display:block;transition:border-color .15s,box-shadow .15s;box-shadow:var(--shadow)}
+.blog-card:hover{border-color:var(--brand);box-shadow:0 4px 12px rgba(37,99,235,.1)}
+.blog-card-title{font-size:16px;font-weight:500;margin-bottom:6px;line-height:1.4}
+.blog-card-excerpt{font-size:13px;color:var(--sub);margin-bottom:10px;line-height:1.5}
+.blog-card-footer{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#9ca3af}
+.blog-tags{display:flex;gap:5px;flex-wrap:wrap}
+.blog-tag{font-size:10px;padding:2px 7px;border-radius:100px;background:var(--brand-light);color:var(--brand);font-weight:500}
+.ad-slot{background:var(--white);border:1px solid var(--border);border-radius:var(--rs);padding:12px;text-align:center;color:#d1d5db;font-size:12px;margin:24px 0;min-height:100px;display:flex;align-items:center;justify-content:center}
+.empty{text-align:center;padding:60px 20px;color:var(--sub)}
+#loading{text-align:center;padding:40px;color:var(--sub);font-size:14px}
+footer{border-top:1px solid var(--border);background:var(--white);padding:18px 24px;text-align:center;font-size:12px;color:var(--sub)}
+footer a{color:var(--sub);text-decoration:none;margin:0 8px}
+</style>
+</head>
+<body>
+<header>
+  <a href="/" class="logo">
+    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+    MakeImageSmall
+  </a>
+  <div>
+    <a href="/" class="nav-link">Tool</a>
+    <a href="/blog/" class="nav-link">Blog</a>
+  </div>
+</header>
+<main>
+  <h1>Image Optimization Blog</h1>
+  <p class="page-sub">Free guides on image compression, WebP, website speed, and SEO performance.</p>
+
+  <div class="ad-slot"><!-- AdSense unit --></div>
+
+  <div id="loading">Loading articles…</div>
+  <div class="blog-grid" id="blogGrid" style="display:none"></div>
+
+  <div class="ad-slot" style="margin-top:24px"><!-- AdSense unit --></div>
+</main>
+<footer>
+  <a href="/">Home</a><a href="/blog/">Blog</a><a href="/privacy.html">Privacy</a>
+  <div style="margin-top:8px">&copy; 2026 MakeImageSmall — Free Image Compressor</div>
+</footer>
+<script>
+fetch('/blog/posts.json?v='+Date.now())
+  .then(r=>r.json())
+  .then(posts=>{
+    document.getElementById('loading').style.display='none';
+    const grid=document.getElementById('blogGrid');
+    grid.style.display='grid';
+    const sorted=[...posts].reverse();
+    if(!sorted.length){grid.innerHTML='<div class="empty">No posts yet — check back soon.</div>';return}
+    grid.innerHTML=sorted.map(p=>`
+      <a href="/blog/${p.slug}.html" class="blog-card">
+        <div class="blog-card-title">${p.title}</div>
+        <div class="blog-card-excerpt">${p.excerpt||''}</div>
+        <div class="blog-card-footer">
+          <div class="blog-tags">${(p.tags||[]).slice(0,3).map(t=>`<span class="blog-tag">${t}</span>`).join('')}</div>
+          <span>${p.date}</span>
+        </div>
+      </a>`).join('');
+  })
+  .catch(()=>{
+    document.getElementById('loading').textContent='No articles yet.';
+  });
+</script>
+</body>
+</html>
