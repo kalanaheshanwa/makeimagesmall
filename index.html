@@ -104,12 +104,15 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;hei
 .compare-wrap{position:relative;width:100%;height:100%;min-height:300px;overflow:hidden;cursor:col-resize;user-select:none}
 .compare-img{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .compare-img img{max-width:100%;max-height:60vh;object-fit:contain;display:block;margin:auto}
-.compare-after{clip-path:inset(0 50% 0 0)}
+.compare-before{clip-path:inset(0 50% 0 0)}
 .compare-divider{position:absolute;top:0;bottom:0;width:3px;background:white;left:50%;transform:translateX(-50%);pointer-events:none;box-shadow:0 0 8px rgba(0,0,0,.4)}
 .compare-handle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:white;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:none}
 .compare-label{position:absolute;top:10px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;pointer-events:none}
 .label-before{left:10px;background:rgba(0,0,0,.5);color:white}
 .label-after{right:10px;background:var(--brand);color:white}
+.no-preview-msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:#f3f4f6}
+.no-preview-msg .icon{font-size:32px;opacity:.4}
+.no-preview-msg p{font-size:13px;color:var(--sub);text-align:center;max-width:260px;line-height:1.5}
 .modal-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:8px}
 .modal-hint{font-size:12px;color:var(--sub)}
 .spin{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--brand);animation:spin .7s linear infinite}
@@ -176,6 +179,9 @@ footer a:hover{color:var(--text)}
       Select images
     </button>
     <div class="formats">Supports JPG · PNG · GIF · BMP · AVIF · TIFF · WebP · <strong style="color:var(--brand)">HEIC/HEIF</strong> · and more</div>
+    <div id="heicNotice" style="display:none;margin-top:10px;font-size:12px;color:var(--sub);background:var(--brand-light);border:1px solid var(--brand-mid);border-radius:var(--rs);padding:7px 12px;max-width:420px;margin-left:auto;margin-right:auto">
+      <strong style="color:var(--brand)">ℹ️ HEIC detected</strong> — Browsers can't preview HEIC files, but we'll compress them to WebP. The compressed result will be fully viewable.
+    </div>
   </div>
 
   <div class="controls">
@@ -261,8 +267,8 @@ footer a:hover{color:var(--text)}
     </div>
     <div class="modal-body">
       <div class="compare-wrap" id="compareWrap">
-        <div class="compare-img" id="imgBefore"><img id="beforeImg" alt="Original"></div>
-        <div class="compare-img compare-after" id="imgAfter"><img id="afterImg" alt="Compressed"></div>
+        <div class="compare-img" id="imgAfter"><img id="afterImg" alt="Compressed"></div>
+        <div class="compare-img compare-before" id="imgBefore"><img id="beforeImg" alt="Original"></div>
         <div class="compare-divider" id="divider"></div>
         <div class="compare-handle" id="handle">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/><polyline points="9 18 3 12 9 6" transform="translate(6,0)"/></svg>
@@ -336,6 +342,9 @@ async function fileToImageBlob(file){
 function handleFiles(files){
   originalFiles=[...originalFiles,...files].filter((f,i,a)=>a.findIndex(x=>x.name===f.name&&x.size===f.size)===i);
   resetQualityDesc();
+  // Show HEIC notice if any HEIC files included
+  const hasHeic=files.some(f=>isHeic(f));
+  document.getElementById('heicNotice').style.display=hasHeic?'block':'none';
   const total=files.length;let done=0;
   document.getElementById('progressWrap').style.display='block';
   document.getElementById('progFill').style.width='0%';
@@ -399,12 +408,14 @@ let previewData={};
 function cardDone(id,orig,blob,url,outName,keptOriginal){
   const c=document.getElementById(id);if(!c)return;c.classList.add('done');
   const saved=Math.round((orig.size-blob.size)/orig.size*100),smaller=blob.size<orig.size;
-  const origUrl=URL.createObjectURL(orig);
-  previewData[id]={origUrl,compUrl:url,outName,origSize:orig.size,compSize:blob.size,saved,keptOriginal};
+  const canPreviewOrig=!isHeic(orig);
+  const origUrl=canPreviewOrig?URL.createObjectURL(orig):null;
+  previewData[id]={origUrl,compUrl:url,outName,origSize:orig.size,compSize:blob.size,saved,keptOriginal,canPreviewOrig};
   const badge = keptOriginal
     ? `<span class="save-pill" style="background:#fef9c3;color:#854d0e">kept original</span>`
     : `<span class="save-pill ${smaller?'':'up'}">${smaller?'-':'+'}${Math.abs(saved)}%</span>`;
-  c.innerHTML=`<img class="fc-thumb" src="${url}" alt="" style="cursor:pointer" onclick="openPreview('${id}')"><div><div class="fc-name">${outName}</div><div class="fc-meta"><span>${fmt(orig.size)}</span><span style="color:#d1d5db">→</span><span class="sz-after">${fmt(blob.size)}</span>${badge}</div></div><div class="fc-actions"><button class="btn-preview" onclick="openPreview('${id}')">Preview</button><button class="btn-save" onclick="dl('${url}','${outName}')">Save</button><div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>`;
+  const heicNote=isHeic(orig)?`<div style="font-size:11px;color:var(--sub);margin-top:4px;display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>HEIC original can't be previewed in browser — compressed WebP shown</div>`:'';
+  c.innerHTML=`<img class="fc-thumb" src="${url}" alt="" style="cursor:pointer" onclick="openPreview('${id}')"><div style="min-width:0"><div class="fc-name">${outName}</div><div class="fc-meta"><span>${fmt(orig.size)}</span><span style="color:#d1d5db">→</span><span class="sz-after">${fmt(blob.size)}</span>${badge}</div>${heicNote}</div><div class="fc-actions"><button class="btn-preview" onclick="openPreview('${id}')">Preview</button><button class="btn-save" onclick="dl('${url}','${outName}')">Save</button><div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>`;
 }
 function cardError(id,msg){const c=document.getElementById(id);if(!c)return;c.classList.add('error');c.querySelector('.fc-meta').innerHTML=`<span style="color:#ef4444">${msg}</span>`;c.querySelector('.fc-actions').innerHTML=`<span style="color:#ef4444;font-size:18px">✕</span>`}
 function updateSummary(){
@@ -429,17 +440,40 @@ async function downloadAll(){
   btn.disabled=false;resetDlBtn();
 }
 function resetDlBtn(){document.getElementById('dlAllBtn').innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" stroke="white" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download all'}
-function clearAll(){results.forEach(f=>URL.revokeObjectURL(f.url));results=[];originalFiles=[];totalBefore=0;totalAfter=0;doneCount=0;document.getElementById('fileList').innerHTML='';document.getElementById('resultsBar').style.display='none';document.getElementById('summaryStrip').style.display='none';document.getElementById('progressWrap').style.display='none';resetQualityDesc();fileInput.value=''}
+function clearAll(){results.forEach(f=>URL.revokeObjectURL(f.url));results=[];originalFiles=[];totalBefore=0;totalAfter=0;doneCount=0;document.getElementById('fileList').innerHTML='';document.getElementById('resultsBar').style.display='none';document.getElementById('summaryStrip').style.display='none';document.getElementById('progressWrap').style.display='none';document.getElementById('heicNotice').style.display='none';resetQualityDesc();fileInput.value=''}
 
 function openPreview(id){
   const d=previewData[id];if(!d)return;
-  document.getElementById('beforeImg').src=d.origUrl;
+  const wrap=document.getElementById('compareWrap');
+  const existingMsg=wrap.querySelector('.no-preview-msg');
+  if(existingMsg)existingMsg.remove();
+
   document.getElementById('afterImg').src=d.compUrl;
+
+  if(d.canPreviewOrig && d.origUrl){
+    document.getElementById('beforeImg').src=d.origUrl;
+    document.getElementById('imgBefore').style.display='flex';
+    document.getElementById('divider').style.display='block';
+    document.getElementById('handle').style.display='flex';
+    document.querySelector('.label-before').style.display='block';
+    document.querySelector('.label-after').style.display='block';
+    setDivider(50);
+  } else {
+    document.getElementById('imgBefore').style.display='none';
+    document.getElementById('divider').style.display='none';
+    document.getElementById('handle').style.display='none';
+    document.querySelector('.label-before').style.display='none';
+    document.querySelector('.label-after').style.display='none';
+    const msg=document.createElement('div');
+    msg.className='no-preview-msg';
+    msg.innerHTML=`<div style="font-size:32px;opacity:.4">🖼️</div><p style="font-size:13px;color:var(--sub);text-align:center;max-width:260px;line-height:1.5">Original preview not available for HEIC/HEIF files — browsers can't display this format. Your compressed WebP is ready to download.</p>`;
+    wrap.appendChild(msg);
+  }
+
   document.getElementById('modalTitle').textContent=d.outName;
   const pct=d.saved>0?`-${d.saved}%`:`+${Math.abs(d.saved)}%`;
   document.getElementById('modalMeta').innerHTML=`<span>${fmt(d.origSize)}</span><span>→</span><span style="color:var(--green);font-weight:500">${fmt(d.compSize)}</span><span style="background:var(--green-mid);color:var(--green);padding:2px 7px;border-radius:100px;font-weight:600">${pct}</span>`;
   document.getElementById('modalDlBtn').onclick=()=>dl(d.compUrl,d.outName);
-  setDivider(50);
   document.getElementById('modalOverlay').classList.add('open');
   document.body.style.overflow='hidden';
 }
@@ -451,11 +485,11 @@ function closeModal(e){if(e.target===document.getElementById('modalOverlay'))clo
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalDirect()});
 
 function setDivider(pct){
-  const w=document.getElementById('compareWrap').offsetWidth;
   const x=Math.max(5,Math.min(95,pct));
   document.getElementById('divider').style.left=x+'%';
   document.getElementById('handle').style.left=x+'%';
-  document.getElementById('imgAfter').style.clipPath=`inset(0 ${100-x}% 0 0)`;
+  // Original (before) is on top — clip to show left x% only
+  document.getElementById('imgBefore').style.clipPath=`inset(0 ${100-x}% 0 0)`;
 }
 
 let dragging=false;
