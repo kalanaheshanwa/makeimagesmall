@@ -90,6 +90,28 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;hei
 .fc-actions{display:flex;gap:8px;align-items:center}
 .btn-save{padding:6px 12px;background:none;border:1px solid var(--border);border-radius:var(--rs);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;color:var(--text);transition:background .15s;white-space:nowrap}
 .btn-save:hover{background:var(--bg)}
+.btn-preview{padding:6px 12px;background:none;border:1px solid var(--border);border-radius:var(--rs);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;color:var(--brand);border-color:var(--brand-mid);transition:background .15s;white-space:nowrap}
+.btn-preview:hover{background:var(--brand-light)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:var(--r);width:100%;max-width:900px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);flex-shrink:0}
+.modal-title{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
+.modal-meta{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--sub)}
+.modal-close{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--sub);flex-shrink:0}
+.modal-close:hover{background:var(--bg)}
+.modal-body{flex:1;overflow:hidden;position:relative;min-height:300px;background:#f3f4f6}
+.compare-wrap{position:relative;width:100%;height:100%;min-height:300px;overflow:hidden;cursor:col-resize;user-select:none}
+.compare-img{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.compare-img img{max-width:100%;max-height:60vh;object-fit:contain;display:block;margin:auto}
+.compare-after{clip-path:inset(0 50% 0 0)}
+.compare-divider{position:absolute;top:0;bottom:0;width:3px;background:white;left:50%;transform:translateX(-50%);pointer-events:none;box-shadow:0 0 8px rgba(0,0,0,.4)}
+.compare-handle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;background:white;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:none}
+.compare-label{position:absolute;top:10px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px;pointer-events:none}
+.label-before{left:10px;background:rgba(0,0,0,.5);color:white}
+.label-after{right:10px;background:var(--brand);color:white}
+.modal-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:8px}
+.modal-hint{font-size:12px;color:var(--sub)}
 .spin{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);border-top-color:var(--brand);animation:spin .7s linear infinite}
 .check{width:20px;height:20px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center}
 .check svg{width:11px;height:11px;stroke:white;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
@@ -229,6 +251,33 @@ footer a:hover{color:var(--text)}
   &copy; 2026 MakeImageSmall &mdash; Free Image Compressor &mdash; No uploads &middot; No tracking &middot; All processing in your browser
 </footer>
 
+<!-- Preview modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-meta" id="modalMeta"></div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="compare-wrap" id="compareWrap">
+        <div class="compare-img" id="imgBefore"><img id="beforeImg" alt="Original"></div>
+        <div class="compare-img compare-after" id="imgAfter"><img id="afterImg" alt="Compressed"></div>
+        <div class="compare-divider" id="divider"></div>
+        <div class="compare-handle" id="handle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/><polyline points="9 18 3 12 9 6" transform="translate(6,0)"/></svg>
+        </div>
+        <div class="compare-label label-before">Original</div>
+        <div class="compare-label label-after">Compressed</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <span class="modal-hint">← Drag to compare original vs compressed →</span>
+      <button class="btn-dlall" id="modalDlBtn" style="padding:8px 18px;font-size:13px;">↓ Download</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),qualitySlider=document.getElementById('qualitySlider'),qualityNum=document.getElementById('qualityNum');
@@ -317,13 +366,16 @@ function makeCard(file,id){
   d.innerHTML=`<img class="fc-thumb" src="${t}" alt=""><div><div class="fc-name">${file.name}</div><div class="fc-meta"><span>${fmt(file.size)}</span><span style="color:#d1d5db">→</span><span style="color:#9ca3af">compressing…</span></div></div><div class="fc-actions"><div class="spin"></div></div>`;
   return d;
 }
+let previewData={};
 function cardDone(id,orig,blob,url,outName,keptOriginal){
   const c=document.getElementById(id);if(!c)return;c.classList.add('done');
   const saved=Math.round((orig.size-blob.size)/orig.size*100),smaller=blob.size<orig.size;
+  const origUrl=URL.createObjectURL(orig);
+  previewData[id]={origUrl,compUrl:url,outName,origSize:orig.size,compSize:blob.size,saved,keptOriginal};
   const badge = keptOriginal
     ? `<span class="save-pill" style="background:#fef9c3;color:#854d0e">kept original</span>`
     : `<span class="save-pill ${smaller?'':'up'}">${smaller?'-':'+'}${Math.abs(saved)}%</span>`;
-  c.innerHTML=`<img class="fc-thumb" src="${url}" alt=""><div><div class="fc-name">${outName}</div><div class="fc-meta"><span>${fmt(orig.size)}</span><span style="color:#d1d5db">→</span><span class="sz-after">${fmt(blob.size)}</span>${badge}</div></div><div class="fc-actions"><button class="btn-save" onclick="dl('${url}','${outName}')">Save</button><div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>`;
+  c.innerHTML=`<img class="fc-thumb" src="${url}" alt="" style="cursor:pointer" onclick="openPreview('${id}')"><div><div class="fc-name">${outName}</div><div class="fc-meta"><span>${fmt(orig.size)}</span><span style="color:#d1d5db">→</span><span class="sz-after">${fmt(blob.size)}</span>${badge}</div></div><div class="fc-actions"><button class="btn-preview" onclick="openPreview('${id}')">Preview</button><button class="btn-save" onclick="dl('${url}','${outName}')">Save</button><div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>`;
 }
 function cardError(id,msg){const c=document.getElementById(id);if(!c)return;c.classList.add('error');c.querySelector('.fc-meta').innerHTML=`<span style="color:#ef4444">${msg}</span>`;c.querySelector('.fc-actions').innerHTML=`<span style="color:#ef4444;font-size:18px">✕</span>`}
 function updateSummary(){
@@ -349,6 +401,48 @@ async function downloadAll(){
 }
 function resetDlBtn(){document.getElementById('dlAllBtn').innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" stroke="white" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download all'}
 function clearAll(){results.forEach(f=>URL.revokeObjectURL(f.url));results=[];originalFiles=[];totalBefore=0;totalAfter=0;doneCount=0;document.getElementById('fileList').innerHTML='';document.getElementById('resultsBar').style.display='none';document.getElementById('summaryStrip').style.display='none';document.getElementById('progressWrap').style.display='none';resetQualityDesc();fileInput.value=''}
+
+function openPreview(id){
+  const d=previewData[id];if(!d)return;
+  document.getElementById('beforeImg').src=d.origUrl;
+  document.getElementById('afterImg').src=d.compUrl;
+  document.getElementById('modalTitle').textContent=d.outName;
+  const pct=d.saved>0?`-${d.saved}%`:`+${Math.abs(d.saved)}%`;
+  document.getElementById('modalMeta').innerHTML=`<span>${fmt(d.origSize)}</span><span>→</span><span style="color:var(--green);font-weight:500">${fmt(d.compSize)}</span><span style="background:var(--green-mid);color:var(--green);padding:2px 7px;border-radius:100px;font-weight:600">${pct}</span>`;
+  document.getElementById('modalDlBtn').onclick=()=>dl(d.compUrl,d.outName);
+  setDivider(50);
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModalDirect(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+function closeModal(e){if(e.target===document.getElementById('modalOverlay'))closeModalDirect();}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalDirect()});
+
+function setDivider(pct){
+  const w=document.getElementById('compareWrap').offsetWidth;
+  const x=Math.max(5,Math.min(95,pct));
+  document.getElementById('divider').style.left=x+'%';
+  document.getElementById('handle').style.left=x+'%';
+  document.getElementById('imgAfter').style.clipPath=`inset(0 ${100-x}% 0 0)`;
+}
+
+let dragging=false;
+document.getElementById('compareWrap').addEventListener('mousedown',e=>{dragging=true;e.preventDefault()});
+document.addEventListener('mousemove',e=>{
+  if(!dragging)return;
+  const wrap=document.getElementById('compareWrap');
+  const rect=wrap.getBoundingClientRect();
+  setDivider(((e.clientX-rect.left)/rect.width)*100);
+});
+document.addEventListener('mouseup',()=>dragging=false);
+document.getElementById('compareWrap').addEventListener('touchmove',e=>{
+  const wrap=document.getElementById('compareWrap');
+  const rect=wrap.getBoundingClientRect();
+  setDivider(((e.touches[0].clientX-rect.left)/rect.width)*100);
+},{passive:true});
 
 // Load blog preview
 fetch('/blog/posts.json').then(r=>r.json()).then(posts=>{
