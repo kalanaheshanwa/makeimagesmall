@@ -445,30 +445,39 @@ function clearAll(){results.forEach(f=>URL.revokeObjectURL(f.url));results=[];or
 function openPreview(id){
   const d=previewData[id];if(!d)return;
   const wrap=document.getElementById('compareWrap');
+
+  // Always show compressed on right (bottom layer, full width)
+  document.getElementById('afterImg').src=d.compUrl;
+
+  // Clean up any previous no-preview message
   const existingMsg=wrap.querySelector('.no-preview-msg');
   if(existingMsg)existingMsg.remove();
 
-  document.getElementById('afterImg').src=d.compUrl;
-
   if(d.canPreviewOrig && d.origUrl){
+    // Normal compare — show original on left
     document.getElementById('beforeImg').src=d.origUrl;
     document.getElementById('imgBefore').style.display='flex';
-    document.getElementById('divider').style.display='block';
-    document.getElementById('handle').style.display='flex';
-    document.querySelector('.label-before').style.display='block';
-    document.querySelector('.label-after').style.display='block';
-    setDivider(50);
+    document.getElementById('imgBefore').style.background='';
+    document.getElementById('imgBefore').innerHTML=`<img id="beforeImg" src="${d.origUrl}" alt="Original">`;
   } else {
-    document.getElementById('imgBefore').style.display='none';
-    document.getElementById('divider').style.display='none';
-    document.getElementById('handle').style.display='none';
-    document.querySelector('.label-before').style.display='none';
-    document.querySelector('.label-after').style.display='none';
-    const msg=document.createElement('div');
-    msg.className='no-preview-msg';
-    msg.innerHTML=`<div style="font-size:32px;opacity:.4">🖼️</div><p style="font-size:13px;color:var(--sub);text-align:center;max-width:260px;line-height:1.5">Original preview not available for HEIC/HEIF files — browsers can't display this format. Your compressed WebP is ready to download.</p>`;
-    wrap.appendChild(msg);
+    // HEIC or unsupported — show message panel on left side
+    document.getElementById('imgBefore').style.display='flex';
+    document.getElementById('imgBefore').style.background='#f3f4f6';
+    document.getElementById('imgBefore').innerHTML=`
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;text-align:center;height:100%;width:100%">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        <div style="font-size:12px;font-weight:600;color:#6b7280">Original not previewable</div>
+        <div style="font-size:11px;color:#9ca3af;line-height:1.5;max-width:160px">HEIC/HEIF files can't be displayed by browsers directly. The original file is unchanged.</div>
+        <div style="font-size:11px;background:#e5e7eb;color:#6b7280;padding:3px 8px;border-radius:100px">${fmt(d.origSize)} · ${d.outName.split('.').pop().toUpperCase()} original</div>
+      </div>`;
   }
+
+  // Always show divider and labels
+  document.getElementById('divider').style.display='block';
+  document.getElementById('handle').style.display='flex';
+  document.querySelector('.label-before').style.display='block';
+  document.querySelector('.label-after').style.display='block';
+  setDivider(50);
 
   document.getElementById('modalTitle').textContent=d.outName;
   const pct=d.saved>0?`-${d.saved}%`:`+${Math.abs(d.saved)}%`;
