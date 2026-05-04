@@ -21,8 +21,8 @@
   })();
 </script>
 <!-- Google Analytics 4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-75H4L1SH2X"></script>
-<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-75H4L1SH2X');</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-P5ERVP0NVS"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-P5ERVP0NVS');</script>
 <!-- Google AdSense -->
 <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
 <script type="application/ld+json">
@@ -65,8 +65,8 @@ header{background:var(--white);border-bottom:1px solid var(--border);padding:12p
 .logo{font-size:17px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;text-decoration:none}
 .logo-icon{width:30px;height:30px;background:var(--brand);border-radius:8px;display:flex;align-items:center;justify-content:center;transition:transform .2s,background .3s}
 .logo:hover .logo-icon{transform:scale(1.08)}
-.logo-icon svg{width:17px;height:17px}
-.logo-text{font-weight:600;font-size:16px;letter-spacing:-.01em}
+.logo-svg{width:32px;height:32px;flex-shrink:0}
+.logo-text{font-weight:600;font-size:16px;letter-spacing:-.01em;color:var(--text)}
 .header-right{display:flex;align-items:center;gap:10px}
 .nav-link{font-size:13px;color:var(--sub);text-decoration:none;font-weight:500;padding:5px 10px;border-radius:6px;transition:color .15s,background .15s}
 .nav-link:hover{color:var(--text);background:var(--surface)}
@@ -252,14 +252,16 @@ footer a:hover{color:var(--text)}
 
 <header>
   <a href="/" class="logo">
-    <div class="logo-icon">
-      <svg viewBox="0 0 24 24" fill="none">
-        <rect x="2" y="5" width="20" height="14" rx="2.5" stroke="white" stroke-width="1.7"/>
-        <circle cx="8" cy="10.5" r="1.8" fill="white" opacity=".9"/>
-        <path d="M2 19l5-6 4 4 3-4 8 6" fill="white" opacity=".85"/>
-        <path d="M14 3l2.5 2.5M19 3l-2.5 2.5" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
-      </svg>
-    </div>
+    <svg class="logo-svg" viewBox="0 0 403 405" xmlns="http://www.w3.org/2000/svg" fill="none">
+      <!-- Green small square top-left -->
+      <rect fill="#6cd074" x="8" y="4" width="59" height="59"/>
+      <!-- Green inner square -->
+      <rect fill="#6cd074" x="118" y="116" width="171" height="171"/>
+      <!-- Blue L top-right -->
+      <polygon fill="#608df0" points="337 4 118 4 118 63 337 63 337 282 396 282 396 63 396 4"/>
+      <!-- Blue L bottom-left -->
+      <polygon fill="#608df0" points="67 342 67 123 8 123 8 342 8 401 67 401 286 401 286 342"/>
+    </svg>
     <span class="logo-text">MakeImageSmall</span>
   </a>
   <div class="header-right">
