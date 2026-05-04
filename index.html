@@ -300,16 +300,15 @@ footer a:hover{color:var(--text)}
 [data-theme="dark"] .toast.success{background:var(--green);color:white}
 [data-theme="dark"] .toast.info{background:var(--brand);color:white}
 
-/* Compact drop zone after compression */
-.drop-zone.compact{padding:16px 24px;display:flex;align-items:center;gap:16px;text-align:left}
-.drop-zone.compact .dz-icon{width:36px;height:36px;border-radius:10px;margin:0;flex-shrink:0;box-shadow:none}
-.drop-zone.compact .dz-icon svg{width:18px;height:18px}
-.drop-zone.compact .dz-title{font-size:14px;margin-bottom:0}
-.drop-zone.compact .dz-sub{display:none}
-.drop-zone.compact .btn-pick{padding:8px 16px;font-size:13px}
-.drop-zone.compact .formats{display:none}
-.drop-zone.compact #heicNotice{display:none!important}
-.drop-zone.compact .dz-text{flex:1}
+
+
+
+/* Scroll down arrow after compression */
+.scroll-hint{display:none;text-align:center;margin:8px 0 4px;animation:bounceDown 1.2s ease infinite}
+.scroll-hint.show{display:block}
+.scroll-hint svg{width:28px;height:28px;stroke:var(--brand);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
+.scroll-hint span{display:block;font-size:11px;color:var(--sub);margin-top:2px}
+@keyframes bounceDown{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
 
 @keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -364,10 +363,8 @@ footer a:hover{color:var(--text)}
     <div class="dz-icon">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
     </div>
-    <div class="dz-text">
-      <div class="dz-title" id="dzTitle">Drop your images here</div>
-      <div class="dz-sub">or click to select files from your device</div>
-    </div>
+    <div class="dz-title" id="dzTitle">Drop your images here</div>
+    <div class="dz-sub">or click to select files from your device</div>
     <button class="btn-pick" onclick="document.getElementById('fileInput').click();event.stopPropagation()">
       <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       Select images
@@ -376,6 +373,12 @@ footer a:hover{color:var(--text)}
     <div id="heicNotice" style="display:none;margin-top:12px;font-size:12px;color:var(--brand);background:var(--brand-light);border:1px solid var(--brand-mid);border-radius:var(--rs);padding:7px 14px;max-width:420px;margin-left:auto;margin-right:auto;transition:background .3s,border-color .3s">
       <strong>ℹ️ HEIC detected</strong> — We'll convert your iPhone photos to WebP. This may take a few seconds per file.
     </div>
+  </div>
+
+  <!-- SCROLL HINT -->
+  <div class="scroll-hint" id="scrollHint">
+    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    <span>Results below</span>
   </div>
 
   <!-- QUALITY CONTROL -->
@@ -606,11 +609,7 @@ function handleFiles(files){
   const dzTitle=document.getElementById('dzTitle');
   if(dzTitle)dzTitle.textContent=`Compressing ${files.length} image${files.length!==1?'s':''}…`;
   showToast(`⚡ Compressing ${files.length} image${files.length!==1?'s':''}…`,'info',3000);
-  // Scroll down to show results area
-  setTimeout(()=>{
-    const target=document.getElementById('progressWrap');
-    if(target){target.scrollIntoView({behavior:'smooth',block:'start'});}
-  },150);
+
   const total=files.length;let done=0;
   document.getElementById('progressWrap').style.display='block';
   document.getElementById('progFill').style.width='0%';
@@ -658,8 +657,9 @@ function tick(done,total){
     showToast(`✓ ${total} image${total!==1?'s':''} compressed — ${pct}% smaller`,'success',3500);
     const dzTitle=document.getElementById('dzTitle');
     if(dzTitle)dzTitle.textContent='Drop more images here';
-    // Collapse drop zone to compact bar
-    document.getElementById('dropZone').classList.add('compact');
+
+    // Show scroll hint
+    document.getElementById('scrollHint').classList.add('show');
     // Show done banner
     const banner=document.getElementById('doneBanner');
     banner.classList.add('show');
@@ -724,7 +724,7 @@ function clearAll(){
   document.getElementById('summaryStrip').style.display='none';
   document.getElementById('progressWrap').style.display='none';
   document.getElementById('heicNotice').style.display='none';
-  resetQualityDesc();fileInput.value='';const dzT=document.getElementById('dzTitle');if(dzT)dzT.textContent='Drop your images here';document.getElementById('dropZone').classList.remove('compact');document.getElementById('doneBanner').classList.remove('show');
+  resetQualityDesc();fileInput.value='';const dzT=document.getElementById('dzTitle');if(dzT)dzT.textContent='Drop your images here';document.getElementById('scrollHint').classList.remove('show');document.getElementById('doneBanner').classList.remove('show');
 }
 
 // ── PREVIEW MODAL ──
