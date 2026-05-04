@@ -648,8 +648,7 @@ function tick(done,total){
     showToast(`✓ ${total} image${total!==1?'s':''} compressed — ${pct}% smaller`,'success',3500);
     const dzTitle=document.getElementById('dzTitle');
     if(dzTitle)dzTitle.textContent='Drop more images here';
-    // Show done banner + two-column layout
-    document.getElementById('toolLayout').classList.add('has-results');
+    // Show done banner
     const banner=document.getElementById('doneBanner');
     banner.classList.add('show');
     document.getElementById('doneBannerTitle').textContent=`✓ ${total} image${total!==1?'s':''} compressed successfully`;
@@ -713,7 +712,7 @@ function clearAll(){
   document.getElementById('summaryStrip').style.display='none';
   document.getElementById('progressWrap').style.display='none';
   document.getElementById('heicNotice').style.display='none';
-  resetQualityDesc();fileInput.value='';const dzT=document.getElementById('dzTitle');if(dzT)dzT.textContent='Drop your images here';document.getElementById('toolLayout').classList.remove('has-results');document.getElementById('doneBanner').classList.remove('show');
+  resetQualityDesc();fileInput.value='';const dzT=document.getElementById('dzTitle');if(dzT)dzT.textContent='Drop your images here';document.getElementById('doneBanner').classList.remove('show');
 }
 
 // ── PREVIEW MODAL ──
