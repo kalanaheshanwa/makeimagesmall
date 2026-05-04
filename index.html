@@ -241,6 +241,23 @@ footer a:hover{color:var(--text)}
 .label-after{right:10px;background:var(--brand);color:white}
 .modal-footer{padding:12px 18px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:8px;transition:border-color .3s}
 .modal-hint{font-size:12px;color:var(--sub)}
+.modal-quality{display:flex;align-items:center;gap:10px;padding:10px 18px;border-top:1px solid var(--border);background:var(--surface);flex-wrap:wrap;transition:background .3s,border-color .3s}
+.modal-quality-label{font-size:12px;font-weight:500;color:var(--sub);white-space:nowrap}
+.modal-quality input[type="range"]{width:120px;height:4px;-webkit-appearance:none;background:var(--border);border-radius:2px;outline:none;transition:background .3s}
+.modal-quality input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--brand);cursor:pointer;border:2px solid white;box-shadow:0 0 0 2px var(--brand)}
+.modal-quality-num{font-size:13px;font-weight:600;color:var(--brand);min-width:28px}
+.modal-quality-info{font-size:11px;color:var(--muted);flex:1}
+.btn-recompress{padding:7px 14px;background:var(--brand);color:white;border:none;border-radius:var(--rs);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:background .15s}
+.btn-recompress:hover{background:var(--brand-h)}
+.btn-recompress:disabled{opacity:.5;cursor:not-allowed}
+/* Per-card quality slider */
+.card-quality{display:flex;align-items:center;gap:8px;margin-top:6px;padding-top:6px;border-top:0.5px solid var(--border)}
+.card-quality-label{font-size:11px;color:var(--muted);white-space:nowrap}
+.card-quality input[type="range"]{width:90px;height:3px;-webkit-appearance:none;background:var(--border);border-radius:2px;outline:none}
+.card-quality input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--brand);cursor:pointer;border:2px solid white;box-shadow:0 0 0 1px var(--brand)}
+.card-quality-num{font-size:11px;font-weight:600;color:var(--brand);min-width:24px}
+.btn-card-recompress{padding:3px 9px;background:none;border:1px solid var(--brand-mid);border-radius:100px;font-family:inherit;font-size:11px;font-weight:500;cursor:pointer;color:var(--brand);transition:background .15s;white-space:nowrap}
+.btn-card-recompress:hover{background:var(--brand-light)}
 
 /* ── ANIMATIONS ── */
 @keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
@@ -421,6 +438,13 @@ footer a:hover{color:var(--text)}
         <div class="compare-label label-after">Compressed</div>
       </div>
     </div>
+    <div class="modal-quality" id="modalQualityRow">
+      <span class="modal-quality-label">Quality</span>
+      <input type="range" id="modalQualitySlider" min="10" max="90" value="82" step="1">
+      <span class="modal-quality-num" id="modalQualityNum">82</span>
+      <span class="modal-quality-info" id="modalQualityInfo">Drag to adjust — click Recompress to apply</span>
+      <button class="btn-recompress" id="modalRecompressBtn" onclick="recompressSingle()">↺ Recompress</button>
+    </div>
     <div class="modal-footer">
       <span class="modal-hint">← Drag slider to compare original vs compressed →</span>
       <button class="btn-dlall" id="modalDlBtn" style="padding:8px 18px;font-size:13px;">↓ Download</button>
@@ -555,10 +579,11 @@ function cardDone(id,orig,blob,url,outName,keptOrig){
   const saved=Math.round((orig.size-blob.size)/orig.size*100),smaller=blob.size<orig.size;
   const canPrev=!isHeic(orig);
   const origUrl=canPrev?URL.createObjectURL(orig):null;
-  previewData[id]={origUrl,compUrl:url,outName,origSize:orig.size,compSize:blob.size,saved,keptOrig,canPrev,origFile:orig};
+  previewData[id]={origUrl,compUrl:url,outName,origSize:orig.size,compSize:blob.size,saved,keptOrig,canPrev,origFile:orig,quality:parseInt(qualitySlider.value)};
   const badge=keptOrig?`<span class="save-pill" style="background:#fef9c3;color:#854d0e">kept original</span>`:`<span class="save-pill ${smaller?'':'up'}">${smaller?'-':'+'}${Math.abs(saved)}%</span>`;
   const heicNote=isHeic(orig)?`<div style="font-size:11px;color:var(--sub);margin-top:4px;display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>HEIC original can't be previewed in browser — compressed WebP shown</div>`:'';
-  c.innerHTML=`<img class="fc-thumb" src="${url}" alt="" style="cursor:pointer" onclick="openPreview('${id}')"><div style="min-width:0"><div class="fc-name">${outName}</div><div class="fc-meta"><span>${fmt(orig.size)}</span><span style="color:var(--muted)">→</span><span class="sz-after">${fmt(blob.size)}</span>${badge}</div>${heicNote}</div><div class="fc-actions"><button class="btn-sm preview" onclick="openPreview('${id}')">Preview</button><button class="btn-sm" onclick="dl('${url}','${outName}')">Save</button><div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>`;
+  const cardQ=previewData[id].quality||parseInt(qualitySlider.value);
+  c.innerHTML=`<img class="fc-thumb" src="${url}" alt="" style="cursor:pointer" onclick="openPreview('${id}')"><div style="min-width:0"><div class="fc-name">${outName}</div><div class="fc-meta"><span>${fmt(orig.size)}</span><span style="color:var(--muted)">→</span><span class="sz-after" id="sz-${id}">${fmt(blob.size)}</span><span id="badge-${id}">${badge}</span></div>${heicNote}<div class="card-quality"><span class="card-quality-label">Quality</span><input type="range" class="card-q-slider" min="10" max="90" value="${cardQ}" step="1" oninput="cardQChange('${id}',this.value)"><span class="card-quality-num" id="cq-${id}">${cardQ}</span><button class="btn-card-recompress" id="cqbtn-${id}" onclick="recompressCard('${id}')">Apply</button></div></div><div class="fc-actions"><button class="btn-sm preview" onclick="openPreview('${id}')">Preview</button><button class="btn-sm" id="save-${id}" onclick="dl('${url}','${outName}')">Save</button><div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>`;
 }
 
 function cardError(id,msg){
@@ -631,6 +656,15 @@ function openPreview(id){
   document.querySelector('.label-after').style.display='block';
   setDivider(50);
   document.getElementById('modalTitle').textContent=d.outName;
+  // Sync modal quality slider to this image's quality
+  const mq=d.quality||parseInt(qualitySlider.value);
+  document.getElementById('modalQualitySlider').value=mq;
+  document.getElementById('modalQualityNum').textContent=mq;
+  document.getElementById('modalQualityInfo').textContent='Drag to adjust — click Recompress to apply';
+  document.getElementById('modalRecompressBtn').disabled=false;
+  document.getElementById('modalRecompressBtn').textContent='↺ Recompress';
+  // Store current preview id for recompress
+  window._previewId=id;
   const pct=d.saved>0?`-${d.saved}%`:`+${Math.abs(d.saved)}%`;
   document.getElementById('modalMeta').innerHTML=`<span>${fmt(d.origSize)}</span><span>→</span><span style="color:var(--green);font-weight:500">${fmt(d.compSize)}</span><span style="background:var(--green-mid);color:var(--green);padding:2px 7px;border-radius:100px;font-weight:600">${pct}</span>`;
   document.getElementById('modalDlBtn').onclick=()=>dl(d.compUrl,d.outName);
@@ -643,6 +677,92 @@ function setDivider(pct){
   document.getElementById('handle').style.left=x+'%';
   document.getElementById('imgBefore').style.clipPath=`inset(0 ${100-x}% 0 0)`;
 }
+// Modal quality slider live display
+document.getElementById('modalQualitySlider').addEventListener('input',function(){
+  document.getElementById('modalQualityNum').textContent=this.value;
+  document.getElementById('modalQualityInfo').textContent='Click Recompress to apply quality '+this.value;
+});
+
+async function recompressSingle(){
+  const id=window._previewId;
+  const d=previewData[id];
+  if(!d||!d.origFile)return;
+  const btn=document.getElementById('modalRecompressBtn');
+  btn.disabled=true;btn.textContent='Processing…';
+  const q=parseInt(document.getElementById('modalQualitySlider').value)/100;
+  try{
+    const processable=await fileToBlob(d.origFile);
+    const bUrl=URL.createObjectURL(processable);
+    const img=new Image();
+    await new Promise((r,j)=>{img.onload=r;img.onerror=j;img.src=bUrl});
+    URL.revokeObjectURL(bUrl);
+    const canvas=document.createElement('canvas');
+    const M=16383;let w=img.naturalWidth,h=img.naturalHeight;
+    if(w>M||h>M){const s=Math.min(M/w,M/h);w=Math.floor(w*s);h=Math.floor(h*s)}
+    canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);
+    const blob=await new Promise(r=>canvas.toBlob(r,'image/webp',q));
+    if(!blob)throw new Error('Failed');
+    const useOrig=blob.size>=d.origFile.size;
+    const final=useOrig?d.origFile:blob;
+    const outName=useOrig?d.origFile.name:d.origFile.name.replace(/\.[^.]+$/,'')+'.webp';
+    const url=URL.createObjectURL(final);
+    // Update totals
+    totalAfter=totalAfter-d.compSize+final.size;
+    // Revoke old URLs
+    URL.revokeObjectURL(d.compUrl);
+    if(d.origUrl&&!d.canPrev){}
+    // Update previewData
+    const newSaved=Math.round((d.origFile.size-final.size)/d.origFile.size*100);
+    previewData[id]={...d,compUrl:url,compSize:final.size,saved:newSaved,outName,quality:Math.round(q*100)};
+    // Update results array
+    const ri=results.findIndex(r=>r.name===d.outName||r.url===d.compUrl);
+    if(ri>-1){URL.revokeObjectURL(results[ri].url);results[ri]={name:outName,blob:final,url};}
+    // Refresh modal image
+    document.getElementById('afterImg').src=url;
+    const pct=newSaved>0?`-${newSaved}%`:`+${Math.abs(newSaved)}%`;
+    document.getElementById('modalMeta').innerHTML=`<span>${fmt(d.origFile.size)}</span><span>→</span><span style="color:var(--green);font-weight:500">${fmt(final.size)}</span><span style="background:var(--green-mid);color:var(--green);padding:2px 7px;border-radius:100px;font-weight:600">${pct}</span>`;
+    document.getElementById('modalDlBtn').onclick=()=>dl(url,outName);
+    // Update card
+    const sz=document.getElementById('sz-'+id);
+    const bdg=document.getElementById('badge-'+id);
+    const sv=document.getElementById('save-'+id);
+    const cq=document.getElementById('cq-'+id);
+    const cqslider=document.querySelector(`#${id} .card-q-slider`);
+    if(sz)sz.textContent=fmt(final.size);
+    if(bdg){const smaller=final.size<d.origFile.size;bdg.innerHTML=`<span class="save-pill ${smaller?'':'up'}">${smaller?'-':'+'}${Math.abs(newSaved)}%</span>`;}
+    if(sv)sv.onclick=()=>dl(url,outName);
+    if(cq)cq.textContent=Math.round(q*100);
+    if(cqslider)cqslider.value=Math.round(q*100);
+    updateSummary();updateMeta();
+    btn.textContent='✓ Done';
+    setTimeout(()=>{btn.disabled=false;btn.textContent='↺ Recompress';},1500);
+  }catch(e){btn.disabled=false;btn.textContent='↺ Recompress';console.error(e);}
+}
+
+function cardQChange(id,val){
+  document.getElementById('cq-'+id).textContent=val;
+}
+
+async function recompressCard(id){
+  const d=previewData[id];
+  if(!d||!d.origFile)return;
+  const btn=document.getElementById('cqbtn-'+id);
+  const slider=document.querySelector(`#${id} .card-q-slider`);
+  const q=parseInt(slider?.value||82)/100;
+  if(btn){btn.disabled=true;btn.textContent='…';}
+  // Store quality so modal syncs
+  previewData[id].quality=Math.round(q*100);
+  // Sync modal quality slider
+  document.getElementById('modalQualitySlider').value=Math.round(q*100);
+  // Reuse recompressSingle logic by setting preview id
+  const prev=window._previewId;
+  window._previewId=id;
+  document.getElementById('modalQualitySlider').value=Math.round(q*100);
+  await recompressSingle();
+  window._previewId=prev;
+  if(btn){btn.disabled=false;btn.textContent='Apply';}
+}
+
 function closeModalDirect(){document.getElementById('modalOverlay').classList.remove('open');document.body.style.overflow=''}
 function closeModal(e){if(e.target===document.getElementById('modalOverlay'))closeModalDirect()}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModalDirect()});
