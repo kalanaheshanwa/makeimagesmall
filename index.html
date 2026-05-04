@@ -132,12 +132,14 @@ h1{font-size:clamp(26px,4.5vw,40px);font-weight:600;letter-spacing:-.025em;line-
 @media(max-width:700px){.tool-layout.has-results{grid-template-columns:1fr}}
 .tool-left{position:sticky;top:80px}
 .tool-right{}
-.done-banner{display:none;background:var(--green-light);border:1px solid var(--green-mid);border-radius:var(--r);padding:14px 18px;margin-bottom:16px;align-items:center;gap:12px;transition:background .3s,border-color .3s}
+.done-banner{display:none;background:var(--green-light);border:1px solid var(--green-mid);border-radius:var(--r);padding:12px 16px;margin-bottom:12px;align-items:center;gap:10px;transition:background .3s,border-color .3s;position:static}
 .done-banner.show{display:flex}
-.done-banner-icon{font-size:22px;flex-shrink:0}
+.done-banner-icon{font-size:20px;flex-shrink:0}
 .done-banner-text{flex:1}
-.done-banner-title{font-size:14px;font-weight:600;color:var(--green)}
-.done-banner-sub{font-size:12px;color:var(--sub);margin-top:2px}
+.done-banner-title{font-size:13px;font-weight:600;color:var(--green)}
+.done-banner-sub{font-size:12px;color:var(--sub);margin-top:1px}
+/* Fix sticky header overlap on scroll */
+#progressWrap,#resultsBar,#summaryStrip,#fileList{scroll-margin-top:70px}
 .drop-zone{background:var(--white);border:2px dashed var(--border-strong);border-radius:var(--r);padding:52px 24px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s,transform .15s,box-shadow .2s;margin:28px 0 16px;box-shadow:var(--shadow);position:relative;overflow:hidden;animation:fadeDown .5s .28s ease both}
 [data-theme="dark"] .drop-zone{background:var(--white)}
 .drop-zone::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,var(--brand-light) 0%,transparent 65%);pointer-events:none;opacity:.6;transition:opacity .2s}
@@ -303,13 +305,6 @@ footer a:hover{color:var(--text)}
 
 
 
-/* Scroll down arrow after compression */
-.scroll-hint{display:none;text-align:center;margin:8px 0 4px;animation:bounceDown 1.2s ease infinite}
-.scroll-hint.show{display:block}
-.scroll-hint svg{width:28px;height:28px;stroke:var(--brand);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
-.scroll-hint span{display:block;font-size:11px;color:var(--sub);margin-top:2px}
-@keyframes bounceDown{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
-
 @keyframes fadeDown{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -373,12 +368,6 @@ footer a:hover{color:var(--text)}
     <div id="heicNotice" style="display:none;margin-top:12px;font-size:12px;color:var(--brand);background:var(--brand-light);border:1px solid var(--brand-mid);border-radius:var(--rs);padding:7px 14px;max-width:420px;margin-left:auto;margin-right:auto;transition:background .3s,border-color .3s">
       <strong>ℹ️ HEIC detected</strong> — We'll convert your iPhone photos to WebP. This may take a few seconds per file.
     </div>
-  </div>
-
-  <!-- SCROLL HINT -->
-  <div class="scroll-hint" id="scrollHint">
-    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-    <span>Results below</span>
   </div>
 
   <!-- QUALITY CONTROL -->
@@ -658,8 +647,6 @@ function tick(done,total){
     const dzTitle=document.getElementById('dzTitle');
     if(dzTitle)dzTitle.textContent='Drop more images here';
 
-    // Show scroll hint
-    document.getElementById('scrollHint').classList.add('show');
     // Show done banner
     const banner=document.getElementById('doneBanner');
     banner.classList.add('show');
@@ -724,7 +711,7 @@ function clearAll(){
   document.getElementById('summaryStrip').style.display='none';
   document.getElementById('progressWrap').style.display='none';
   document.getElementById('heicNotice').style.display='none';
-  resetQualityDesc();fileInput.value='';const dzT=document.getElementById('dzTitle');if(dzT)dzT.textContent='Drop your images here';document.getElementById('scrollHint').classList.remove('show');document.getElementById('doneBanner').classList.remove('show');
+  resetQualityDesc();fileInput.value='';const dzT=document.getElementById('dzTitle');if(dzT)dzT.textContent='Drop your images here';document.getElementById('doneBanner').classList.remove('show');
 }
 
 // ── PREVIEW MODAL ──
