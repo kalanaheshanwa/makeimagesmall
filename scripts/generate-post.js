@@ -128,9 +128,9 @@ full post HTML using only p, h2, h3, ul, ol, li, strong, em, a tags
   const tags    = extract('TAGS').split(',').map(t => t.trim()).filter(Boolean);
   const content = extract('CONTENT');
 
-  console.log('Extracted title:', title ? title.slice(0,50) : 'MISSING');
-  console.log('Extracted content length:', content.length);
-  if (!title || !content) throw new Error(`Missing required fields — title: ${!!title}, content: ${!!content}. Full response: ${text.slice(0, 300)}`);
+  console.log('title:', title ? title.slice(0,60) : 'MISSING');
+  console.log('content length:', content.length);
+  if (!title || !content) throw new Error(`Missing fields. Response preview: ${text.slice(0, 400)}`);
 
   return { title, metaDescription: meta, excerpt, tags, htmlContent: content };
 }
