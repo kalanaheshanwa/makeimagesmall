@@ -1,6 +1,4 @@
-// generate-post.js
-// Run by GitHub Actions every day at midnight UTC
-
+// generate-post.js — Daily SEO blog post generator
 const fs   = require('fs');
 const path = require('path');
 
@@ -23,74 +21,42 @@ const TOPICS = [
   "Core Web Vitals and image optimization: what you need to know",
   "How to convert PNG to WebP for free online",
   "Image optimization checklist for web designers",
-  "Why your website loads slow — images explained",
-  "AVIF vs WebP vs JPEG: the ultimate 2025 comparison",
+  "Why your website loads slow and how to fix it",
+  "AVIF vs WebP vs JPEG: the 2025 comparison",
   "How to optimize images for Google PageSpeed score",
-  "Free image compression tools compared",
-  "What is lossless vs lossy image compression",
-  "How to compress images for Instagram without losing quality",
+  "Free image compression tools compared 2025",
+  "Lossless vs lossy image compression explained",
+  "How to compress images for Instagram without quality loss",
   "Image file size best practices for web developers",
-  "How to make your website load faster with WebP",
+  "How to make your website load faster with WebP images",
   "Reducing image size for mobile websites",
   "How to bulk compress images online for free",
-  "WebP support in all major browsers",
   "How image size affects website bounce rate",
-  "Best practices for compressing images for email newsletters",
-  "How to convert GIF to WebP for smaller animated images",
-  "Image optimization for e-commerce: complete guide",
-  "How to compress screenshots without losing sharpness",
-  "Smallest image format for the web in 2025",
-  "How to optimize images before uploading to Squarespace",
-  "JPG vs PNG: which format should you use",
-  "How image compression improves your SEO rankings",
-  "How to compress images in bulk using only your browser",
-  "How to reduce PDF file size by compressing images inside",
-  "Image optimization for social media platforms",
   "How to compress HEIC iPhone photos online free",
   "Convert HEIC to WebP: complete guide",
-  "How to compress images without installing software",
+  "How to compress images without installing any software",
+  "Image SEO: how to optimize images for search engines",
+  "WebP images and their impact on Core Web Vitals",
 ];
 
 const BLOG_DIR   = path.join(__dirname, '..', 'blog');
 const POSTS_JSON = path.join(BLOG_DIR, 'posts.json');
 
 let posts = [];
-try { posts = JSON.parse(fs.readFileSync(POSTS_JSON, 'utf8')); } catch {}
+try { posts = JSON.parse(fs.readFileSync(POSTS_JSON, 'utf8')); } catch(e) {}
 
-const usedTopics = new Set(posts.map(p => p.topic));
-const available  = TOPICS.filter(t => !usedTopics.has(t));
-const topic      = available.length > 0 ? available[0] : TOPICS[Math.floor(Math.random() * TOPICS.length)];
-const today      = new Date().toISOString().split('T')[0];
+const used    = new Set(posts.map(p => p.topic));
+const avail   = TOPICS.filter(t => !used.has(t));
+const topic   = avail.length > 0 ? avail[0] : TOPICS[Math.floor(Math.random() * TOPICS.length)];
+const today   = new Date().toISOString().split('T')[0];
 
 if (posts.some(p => p.date === today)) {
-  console.log('Post already exists for today. Skipping.');
+  console.log('Already posted today. Done.');
   process.exit(0);
 }
 
-async function generatePost() {
-  // Use XML-style tags so content can't break the response structure
-  const prompt = `You are an SEO content writer for "${SITE_NAME}" (${SITE_URL}), a free browser-based image compressor.
-
-Write a complete SEO blog post on: "${topic}"
-
-Requirements:
-- ~900 words
-- Naturally include keyword: "${KEYWORD}" 3-4 times
-- Mention ${SITE_NAME} with a link: <a href="${SITE_URL}">${SITE_NAME}</a> 2-3 times
-- Strong intro, H2 subheadings every 200 words, practical tips, CTA at end
-- Friendly expert tone
-
-Return your response using EXACTLY these XML tags (nothing outside them):
-
-<TITLE>The SEO blog post title here</TITLE>
-<META>150-160 character meta description with keyword</META>
-<EXCERPT>2 sentence summary for blog listing</EXCERPT>
-<TAGS>tag1,tag2,tag3</TAGS>
-<CONTENT>
-full post HTML using only p, h2, h3, ul, ol, li, strong, em, a tags
-</CONTENT>`;
-
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+async function callClaude(prompt, maxTokens) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -99,66 +65,61 @@ full post HTML using only p, h2, h3, ul, ol, li, strong, em, a tags
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 4000,
+      max_tokens: maxTokens,
       messages: [{ role: 'user', content: prompt }],
     }),
   });
-
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(`API error ${response.status}: ${err}`);
-  }
-
-  const data = await response.json();
-  const text = data.content?.find(b => b.type === 'text')?.text || '';
-
-  // Log raw response for debugging
-  console.log('Raw response (first 500 chars):', text.slice(0, 500));
-
-  // Parse using XML tags
-  const extract = (tag) => {
-    const re = new RegExp('<' + tag + '>([\s\S]*?)<\/' + tag + '>', 'i');
-    const match = text.match(re);
-    return match ? match[1].trim() : '';
-  };
-
-  const title   = extract('TITLE');
-  const meta    = extract('META');
-  const excerpt = extract('EXCERPT');
-  const tags    = extract('TAGS').split(',').map(t => t.trim()).filter(Boolean);
-  const content = extract('CONTENT');
-
-  console.log('title:', title ? title.slice(0,60) : 'MISSING');
-  console.log('content length:', content.length);
-  if (!title || !content) throw new Error(`Missing fields. Response preview: ${text.slice(0, 400)}`);
-
-  return { title, metaDescription: meta, excerpt, tags, htmlContent: content };
+  if (!res.ok) throw new Error('API error ' + res.status + ': ' + await res.text());
+  const data = await res.json();
+  return (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
 }
 
-function slugify(title) {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 65);
-}
+async function run() {
+  console.log('Topic:', topic);
 
-// Read logo SVGs from repo root — they may or may not be there
-function getLogo() {
-  const black = `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" rx="6" fill="#2563eb"/><rect x="6" y="8" width="14" height="14" rx="1.5" fill="none" stroke="white" stroke-width="2"/><rect x="12" y="14" width="14" height="14" rx="1.5" fill="#2563eb" stroke="white" stroke-width="2"/></svg>`;
-  return black;
-}
+  // STEP 1: Get metadata as simple JSON (no HTML, so JSON is safe)
+  const metaPrompt = `For a blog post titled around this topic: "${topic}"
 
-function buildHTML(post, slug) {
-  return `<!DOCTYPE html>
+Return ONLY a JSON object, no markdown, no explanation:
+{"title":"full seo title here","meta":"155 char meta description mentioning ${KEYWORD}","excerpt":"2 sentence summary","tags":["tag1","tag2","tag3"]}`;
+
+  const metaRaw = await callClaude(metaPrompt, 500);
+  console.log('Meta raw:', metaRaw.slice(0, 200));
+  
+  const metaClean = metaRaw.replace(/```json|```/g, '').trim();
+  const meta = JSON.parse(metaClean);
+  console.log('Title:', meta.title);
+
+  // STEP 2: Get HTML content separately (no JSON wrapping, so no breaking)
+  const contentPrompt = `Write a complete SEO blog post for "${SITE_NAME}" (${SITE_URL}) about: "${meta.title}"
+
+Requirements:
+- 900 words
+- Include keyword "${KEYWORD}" naturally 3-4 times  
+- Mention ${SITE_NAME} with link <a href="${SITE_URL}">${SITE_NAME}</a> twice
+- Use h2, h3, p, ul, li, strong, em, a tags only
+- No div, no class, no style attributes
+- End with a paragraph encouraging readers to try the tool
+- Return ONLY the HTML content, no title tag, no head, no body wrapper`;
+
+  const htmlContent = await callClaude(contentPrompt, 4000);
+  console.log('Content length:', htmlContent.length);
+
+  if (!meta.title || !htmlContent) throw new Error('Missing content');
+
+  const slug = meta.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 65);
+  
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${post.title} | ${SITE_NAME}</title>
-<meta name="description" content="${post.metaDescription}">
+<title>${meta.title} | ${SITE_NAME}</title>
+<meta name="description" content="${meta.meta}">
 <link rel="canonical" href="${SITE_URL}/blog/${slug}.html">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta property="og:title" content="${post.title}">
-<meta property="og:description" content="${post.metaDescription}">
+<meta property="og:title" content="${meta.title}">
 <meta property="og:type" content="article">
-<meta property="article:published_time" content="${today}">
 <script>(function(){var s=localStorage.getItem('mis-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s?s:(d?'dark':'light'));})();</script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P5ERVP0NVS"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-P5ERVP0NVS');</script>
@@ -166,8 +127,8 @@ function buildHTML(post, slug) {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--brand:#2563eb;--brand-h:#1d4ed8;--brand-light:#eff6ff;--brand-mid:#dbeafe;--green:#16a34a;--green-light:#f0fdf4;--green-mid:#dcfce7;--bg:#f8fafc;--white:#fff;--surface:#f1f5f9;--text:#0f172a;--sub:#64748b;--muted:#94a3b8;--border:#e2e8f0;--border-strong:#cbd5e1;--shadow:0 1px 3px rgba(0,0,0,.07);--r:14px;--rs:9px}
-[data-theme="dark"]{--brand:#4f8ef7;--brand-h:#6ba3f8;--brand-light:rgba(79,142,247,.1);--brand-mid:rgba(79,142,247,.18);--green:#34d468;--green-light:rgba(52,212,104,.08);--green-mid:rgba(52,212,104,.18);--bg:#0a0a0a;--white:#161616;--surface:#111111;--text:#ededed;--sub:#a0a0a0;--muted:#555555;--border:#272727;--border-strong:#333333}
+:root{--brand:#2563eb;--brand-h:#1d4ed8;--brand-light:#eff6ff;--brand-mid:#dbeafe;--green:#16a34a;--green-light:#f0fdf4;--green-mid:#dcfce7;--bg:#f8fafc;--white:#fff;--surface:#f1f5f9;--text:#0f172a;--sub:#64748b;--muted:#94a3b8;--border:#e2e8f0;--r:14px;--rs:9px}
+[data-theme="dark"]{--brand:#4f8ef7;--brand-h:#6ba3f8;--brand-light:rgba(79,142,247,.1);--brand-mid:rgba(79,142,247,.18);--green:#34d468;--green-light:rgba(52,212,104,.08);--green-mid:rgba(52,212,104,.18);--bg:#0a0a0a;--white:#161616;--surface:#111111;--text:#ededed;--sub:#a0a0a0;--muted:#555555;--border:#272727}
 body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.7;transition:background .3s,color .3s}
 header{background:var(--white);border-bottom:1px solid var(--border);padding:12px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);transition:background .3s,border-color .3s}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-size:16px;font-weight:600;color:var(--text)}
@@ -177,7 +138,7 @@ header{background:var(--white);border-bottom:1px solid var(--border);padding:12p
 .nav-link:hover{color:var(--text)}
 .toggle-wrap{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--sub)}
 .toggle-icon{font-size:14px;cursor:default}
-.dark-toggle{width:38px;height:22px;border-radius:11px;background:var(--border-strong);border:none;cursor:pointer;position:relative;transition:background .3s;flex-shrink:0}
+.dark-toggle{width:38px;height:22px;border-radius:11px;background:#cbd5e1;border:none;cursor:pointer;position:relative;transition:background .3s;flex-shrink:0}
 .dark-toggle::after{content:'';width:16px;height:16px;background:white;border-radius:50%;position:absolute;top:3px;left:3px;transition:left .25s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 [data-theme="dark"] .dark-toggle{background:var(--brand)}
 [data-theme="dark"] .dark-toggle::after{left:19px}
@@ -224,18 +185,18 @@ footer a:hover{color:var(--text)}
   </div>
 </header>
 <main>
-  <div class="breadcrumb"><a href="/">Home</a> / <a href="/blog/">Blog</a> / ${post.title}</div>
-  <h1>${post.title}</h1>
+  <div class="breadcrumb"><a href="/">Home</a> / <a href="/blog/">Blog</a> / ${meta.title}</div>
+  <h1>${meta.title}</h1>
   <div class="post-meta">
     Published: ${today} &middot; ${SITE_NAME}
-    <div class="post-tags">${post.tags.map(t => `<span class="post-tag">${t}</span>`).join('')}</div>
+    <div class="post-tags">${(meta.tags || []).map(t => `<span class="post-tag">${t}</span>`).join('')}</div>
   </div>
   <div class="ad-slot"><!-- AdSense --></div>
-  <article>${post.htmlContent}</article>
+  <article>${htmlContent}</article>
   <div class="ad-slot"><!-- AdSense --></div>
   <div class="cta-box">
     <h3>Try ${SITE_NAME} Free</h3>
-    <p>Compress your images now — no uploads, no account, no limits. Your files never leave your device.</p>
+    <p>Compress your images now — no uploads, no account, no limits. Your files stay on your device.</p>
     <a href="/" class="cta-btn">Compress images free</a>
   </div>
 </main>
@@ -249,22 +210,27 @@ function toggleDark(){const h=document.documentElement;const d=h.getAttribute('d
 </script>
 </body>
 </html>`;
+
+  const filePath = path.join(BLOG_DIR, slug + '.html');
+  fs.writeFileSync(filePath, html, 'utf8');
+  console.log('Written:', slug + '.html');
+
+  posts.push({
+    slug,
+    title: meta.title,
+    date: today,
+    topic,
+    excerpt: meta.excerpt,
+    metaDescription: meta.meta,
+    tags: meta.tags || [],
+    wordCount: 900,
+  });
+  fs.writeFileSync(POSTS_JSON, JSON.stringify(posts, null, 2), 'utf8');
+  console.log('posts.json updated —', posts.length, 'total posts');
+  console.log('Done!');
 }
 
-(async () => {
-  try {
-    console.log(`Generating post for topic: "${topic}"`);
-    const post = await generatePost();
-    const slug = slugify(post.title);
-    const htmlPath = path.join(BLOG_DIR, `${slug}.html`);
-    fs.writeFileSync(htmlPath, buildHTML(post, slug), 'utf8');
-    console.log(`Written: blog/${slug}.html`);
-    posts.push({ slug, title: post.title, date: today, topic, excerpt: post.excerpt, metaDescription: post.metaDescription, tags: post.tags, wordCount: 900 });
-    fs.writeFileSync(POSTS_JSON, JSON.stringify(posts, null, 2), 'utf8');
-    console.log(`Updated posts.json (${posts.length} total posts)`);
-    console.log('Done!');
-  } catch (err) {
-    console.error('Failed:', err.message);
-    process.exit(1);
-  }
-})();
+run().catch(err => {
+  console.error('Error:', err.message);
+  process.exit(1);
+});
