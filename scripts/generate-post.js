@@ -109,7 +109,7 @@ Return ONLY a JSON object, no markdown fences, no preamble, no explanation:
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1000,
+      max_tokens: 4000,
       messages: [{ role: 'user', content: prompt }],
     }),
   });
