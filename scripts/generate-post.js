@@ -112,9 +112,13 @@ full post HTML using only p, h2, h3, ul, ol, li, strong, em, a tags
   const data = await response.json();
   const text = data.content?.find(b => b.type === 'text')?.text || '';
 
-  // Parse using XML tags — much more reliable than JSON
+  // Log raw response for debugging
+  console.log('Raw response (first 500 chars):', text.slice(0, 500));
+
+  // Parse using XML tags
   const extract = (tag) => {
-    const match = text.match(new RegExp(`<${tag}>([\s\S]*?)<\/${tag}>`));
+    const re = new RegExp('<' + tag + '>([\s\S]*?)<\/' + tag + '>', 'i');
+    const match = text.match(re);
     return match ? match[1].trim() : '';
   };
 
@@ -124,7 +128,9 @@ full post HTML using only p, h2, h3, ul, ol, li, strong, em, a tags
   const tags    = extract('TAGS').split(',').map(t => t.trim()).filter(Boolean);
   const content = extract('CONTENT');
 
-  if (!title || !content) throw new Error('Missing required fields in response');
+  console.log('Extracted title:', title ? title.slice(0,50) : 'MISSING');
+  console.log('Extracted content length:', content.length);
+  if (!title || !content) throw new Error(`Missing required fields — title: ${!!title}, content: ${!!content}. Full response: ${text.slice(0, 300)}`);
 
   return { title, metaDescription: meta, excerpt, tags, htmlContent: content };
 }
