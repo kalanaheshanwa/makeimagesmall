@@ -6,7 +6,11 @@
     "topic": "How to reduce image size for website without losing quality",
     "excerpt": "Slow-loading websites lose visitors fast, and oversized images are usually the culprit. Learn practical, proven ways to reduce image size for your website without sacrificing visual quality.",
     "metaDescription": "Learn how to reduce image size for your website without losing quality. Discover top tips and how to compress image online free using MakeImageSmall.",
-    "tags": ["image compression", "website optimization", "compress image online free"],
+    "tags": [
+      "image compression",
+      "website optimization",
+      "compress image online free"
+    ],
     "wordCount": 900
   },
   {
@@ -16,7 +20,28 @@
     "topic": "WebP vs JPG: which format is better for your website",
     "excerpt": "Choosing between WebP and JPG can significantly impact your website speed and SEO. This guide breaks down the differences so you can make the right choice.",
     "metaDescription": "WebP vs JPG: which image format is better for your website in 2026? Compare file size, quality, browser support and learn how to compress image online free.",
-    "tags": ["webp", "jpg", "image format", "compress image online free"],
+    "tags": [
+      "webp",
+      "jpg",
+      "image format",
+      "compress image online free"
+    ],
+    "wordCount": 900
+  },
+  {
+    "slug": "maximize-squarespace-seo-how-webp-format-and-small-image-sizes-bo",
+    "title": "Maximize Squarespace SEO: How WebP Format and Small Image Sizes Boost Your Rankings",
+    "date": "2026-05-07",
+    "topic": "Maximize Squarespace SEO: The Impact of WebP and Small Image Sizes",
+    "excerpt": "Optimizing your Squarespace site with WebP images and compressed file sizes can dramatically improve page speed and search rankings. Discover how to compress images online free and implement best practices to maximize your Squarespace SEO performance.",
+    "metaDescription": "Learn how WebP images and smaller file sizes improve Squarespace SEO. Use a compress image online free tool to speed up your site and rank higher today.",
+    "tags": [
+      "Squarespace SEO",
+      "WebP Images",
+      "Image Optimization",
+      "Page Speed",
+      "Compress Images Online Free"
+    ],
     "wordCount": 900
   }
 ]
