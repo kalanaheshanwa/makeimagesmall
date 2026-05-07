@@ -4,6 +4,19 @@ on:
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Custom blog topic (leave blank for auto)'
+        required: false
+        default: ''
+      keyword:
+        description: 'Target keyword'
+        required: false
+        default: 'compress image online free'
+      description:
+        description: 'Brief description or angle for the post'
+        required: false
+        default: ''
 
 jobs:
   generate-post:
@@ -21,6 +34,9 @@ jobs:
         run: node scripts/generate-post.js
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CUSTOM_TOPIC: ${{ inputs.topic }}
+          CUSTOM_KEYWORD: ${{ inputs.keyword }}
+          CUSTOM_DESCRIPTION: ${{ inputs.description }}
       - name: Commit and push new post
         run: |
           git config user.name "MakeImageSmall Blog Bot"
