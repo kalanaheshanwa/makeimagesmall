@@ -47,11 +47,16 @@ try { posts = JSON.parse(fs.readFileSync(POSTS_JSON, 'utf8')); } catch(e) {}
 
 const used    = new Set(posts.map(p => p.topic));
 const avail   = TOPICS.filter(t => !used.has(t));
-const topic   = avail.length > 0 ? avail[0] : TOPICS[Math.floor(Math.random() * TOPICS.length)];
+// Use custom topic from env (dashboard) or fall back to auto
+const topic   = process.env.CUSTOM_TOPIC || (avail.length > 0 ? avail[0] : TOPICS[Math.floor(Math.random() * TOPICS.length)]);
+const customKeyword = process.env.CUSTOM_KEYWORD || KEYWORD;
+const customDesc = process.env.CUSTOM_DESCRIPTION || '';
 const today   = new Date().toISOString().split('T')[0];
 
-if (posts.some(p => p.date === today)) {
-  console.log('Already posted today. Done.');
+// Skip only if auto-run AND already posted today
+// If a custom topic is provided (from dashboard), always proceed
+if (!process.env.CUSTOM_TOPIC && posts.some(p => p.date === today)) {
+  console.log('Already posted today (auto-run). Done.');
   process.exit(0);
 }
 
