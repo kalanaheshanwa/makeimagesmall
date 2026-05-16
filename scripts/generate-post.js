@@ -6,7 +6,7 @@ const https = require('https');
 
 const SITE_NAME = 'MakeImageSmall';
 const SITE_URL  = 'https://makeimagesmall.com';
-const SC_SITE   = 'sc-domain:makeimagesmall.com';
+const SC_SITE   = 'https://www.makeimagesmall.com/';
 
 const FALLBACK_TOPICS = [
   "How to compress images for Shopify stores",
