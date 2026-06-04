@@ -1,5 +1,4 @@
 name: Daily SEO Blog Post
-
 on:
   schedule:
     - cron: '0 0 * * *'
@@ -17,7 +16,6 @@ on:
         description: 'Brief description or angle for the post'
         required: false
         default: ''
-
 jobs:
   generate-post:
     runs-on: ubuntu-latest
@@ -34,6 +32,7 @@ jobs:
         run: node scripts/generate-post.js
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           CUSTOM_TOPIC: ${{ inputs.topic }}
           CUSTOM_KEYWORD: ${{ inputs.keyword }}
           CUSTOM_DESCRIPTION: ${{ inputs.description }}
