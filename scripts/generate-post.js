@@ -40,7 +40,7 @@ try { posts = JSON.parse(fs.readFileSync(POSTS_JSON, 'utf8')); } catch(e) {}
 const today = new Date().toISOString().split('T')[0];
 
 // Skip if auto-run and already posted today
-if (!process.env.CUSTOM_TOPIC && posts.some(p => p.date === today)) {
+if (false && !process.env.CUSTOM_TOPIC && posts.some(p => p.date === today)) {
   console.log('Already posted today (auto-run). Done.');
   process.exit(0);
 }
