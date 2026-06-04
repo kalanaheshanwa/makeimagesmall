@@ -39,7 +39,6 @@ try { posts = JSON.parse(fs.readFileSync(POSTS_JSON, 'utf8')); } catch(e) {}
 
 const today = new Date().toISOString().split('T')[0];
 
-// Skip if auto-run and already posted today
 if (!process.env.CUSTOM_TOPIC && posts.some(p => p.date === today)) {
   console.log('Already posted today (auto-run). Done.');
   process.exit(0);
@@ -57,19 +56,15 @@ async function getAccessToken() {
     exp: now + 3600,
     iat: now,
   })).toString('base64url');
-
   const { createSign } = require('crypto');
   const sign = createSign('RSA-SHA256');
   sign.update(`${header}.${payload}`);
   const signature = sign.sign(serviceAccount.private_key, 'base64url');
   const jwt = `${header}.${payload}.${signature}`;
-
   return new Promise((resolve, reject) => {
     const body = `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`;
     const req = https.request({
-      hostname: 'oauth2.googleapis.com',
-      path: '/token',
-      method: 'POST',
+      hostname: 'oauth2.googleapis.com', path: '/token', method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': body.length },
     }, res => {
       let data = '';
@@ -86,29 +81,21 @@ async function getAccessToken() {
   });
 }
 
-// ── SEARCH CONSOLE DATA ──
 async function getKeywordOpportunities(token) {
   const endDate = new Date();
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - 28);
-
   const body = JSON.stringify({
     startDate: startDate.toISOString().split('T')[0],
     endDate: endDate.toISOString().split('T')[0],
-    dimensions: ['query'],
-    rowLimit: 100,
+    dimensions: ['query'], rowLimit: 100,
   });
-
   return new Promise((resolve, reject) => {
     const req = https.request({
       hostname: 'searchconsole.googleapis.com',
       path: `/webmasters/v3/sites/${encodeURIComponent(SC_SITE)}/searchAnalytics/query`,
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Content-Length': Buffer.byteLength(body),
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
     }, res => {
       let data = '';
       res.on('data', d => data += d);
@@ -128,15 +115,12 @@ async function getKeywordOpportunities(token) {
 
 function pickBestKeyword(rows, existingPosts) {
   const usedKeywords = new Set(existingPosts.map(p => (p.targetKeyword || '').toLowerCase()));
-
   const opportunities = rows.filter(row => {
     const query = row.keys[0].toLowerCase();
     const alreadyCovered = [...usedKeywords].some(k => k.includes(query) || query.includes(k));
     return row.impressions >= 5 && row.ctr < 0.10 && !alreadyCovered && query.length > 10;
   });
-
   opportunities.sort((a, b) => b.impressions - a.impressions);
-
   if (opportunities.length > 0) {
     const best = opportunities[0];
     console.log(`Best keyword: "${best.keys[0]}" — ${best.impressions} impressions, ${(best.ctr*100).toFixed(1)}% CTR`);
@@ -145,25 +129,15 @@ function pickBestKeyword(rows, existingPosts) {
   return null;
 }
 
-// ── CLAUDE API ──
 async function callClaude(prompt, maxTokens) {
   const body = JSON.stringify({
-    model: 'claude-sonnet-4-6',
-    max_tokens: maxTokens,
+    model: 'claude-sonnet-4-6', max_tokens: maxTokens,
     messages: [{ role: 'user', content: prompt }],
   });
-
   return new Promise((resolve, reject) => {
     const req = https.request({
-      hostname: 'api.anthropic.com',
-      path: '/v1/messages',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'Content-Length': Buffer.byteLength(body),
-      },
+      hostname: 'api.anthropic.com', path: '/v1/messages', method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'Content-Length': Buffer.byteLength(body) },
     }, res => {
       let data = '';
       res.on('data', d => data += d);
@@ -180,20 +154,27 @@ async function callClaude(prompt, maxTokens) {
   });
 }
 
-// ── MAIN ──
+// Inject mini CTA after first </h2> at build time
+function injectMidCta(htmlContent) {
+  const miniCta = `<div style="background:var(--brand-light);border:1px solid var(--brand-mid);border-radius:10px;padding:14px 18px;margin:20px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;transition:background .3s,border-color .3s"><span style="font-size:13px;font-weight:500;color:var(--brand)">🖼️ Try MakeImageSmall free — compress images instantly, no uploads, no limits</span><a href="${SITE_URL}" style="background:var(--brand);color:white;text-decoration:none;padding:8px 16px;border-radius:7px;font-size:13px;font-weight:600;white-space:nowrap;flex-shrink:0">Try it free →</a></div>`;
+  const idx = htmlContent.indexOf('</h2>');
+  if (idx !== -1) {
+    return htmlContent.slice(0, idx + 5) + miniCta + htmlContent.slice(idx + 5);
+  }
+  return htmlContent;
+}
+
 async function run() {
   let keyword = process.env.CUSTOM_KEYWORD || 'compress image online free';
   let topic   = process.env.CUSTOM_TOPIC  || null;
   let source  = 'custom';
 
   if (!topic) {
-    // Try Search Console first
     try {
       console.log('Fetching Search Console data...');
       const token = await getAccessToken();
       const rows  = await getKeywordOpportunities(token);
       console.log(`Got ${rows.length} keywords from Search Console`);
-
       if (rows.length > 0) {
         const bestKeyword = pickBestKeyword(rows, posts);
         if (bestKeyword) {
@@ -205,8 +186,6 @@ async function run() {
     } catch(e) {
       console.log('Search Console unavailable, using fallback:', e.message);
     }
-
-    // Fallback to topic list
     if (!topic) {
       const used  = new Set(posts.map(p => p.topic));
       const avail = FALLBACK_TOPICS.filter(t => !used.has(t));
@@ -218,7 +197,6 @@ async function run() {
 
   console.log(`Source: ${source} | Topic: "${topic}" | Keyword: "${keyword}"`);
 
-  // Step 1: metadata
   const metaRaw = await callClaude(
     `For a blog post about: "${topic}"\nReturn ONLY JSON (no markdown): {"title":"seo title","meta":"155 char meta mentioning: ${keyword}","excerpt":"2 sentence summary","tags":["tag1","tag2","tag3"]}`,
     500
@@ -226,11 +204,13 @@ async function run() {
   const meta = JSON.parse(metaRaw.replace(/```json|```/g,'').trim());
   console.log('Title:', meta.title);
 
-  // Step 2: content
-  const htmlContent = await callClaude(
+  const htmlRaw = await callClaude(
     `Write a 900 word SEO blog post for MakeImageSmall (${SITE_URL}) about: "${meta.title}"\nInclude keyword "${keyword}" 3-4 times. Mention MakeImageSmall with link <a href="${SITE_URL}">MakeImageSmall</a> twice. End with strong CTA to try the free tool. Use h2 h3 p ul li strong em a tags only. Return ONLY HTML content, no title/head/body wrapper.`,
     4000
   );
+
+  // Inject mini CTA after first heading
+  const htmlContent = injectMidCta(htmlRaw);
   console.log('Content length:', htmlContent.length);
 
   const slug = meta.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,65);
