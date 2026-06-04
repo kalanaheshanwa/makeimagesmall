@@ -558,7 +558,11 @@ function isImageFile(f){
   const ext=f.name.split('.').pop().toLowerCase();
   return['heic','heif','jpg','jpeg','png','gif','bmp','webp','avif','tiff','tif'].includes(ext);
 }
-function isHeic(f){return f.type==='image/heic'||f.type==='image/heif'||['heic','heif'].includes(f.name.split('.').pop().toLowerCase())}
+function isHeic(f){
+  const ext=f.name.split('.').pop().toLowerCase();
+  const type=f.type.toLowerCase();
+  return type==='image/heic'||type==='image/heif'||ext==='heic'||ext==='heif';
+}
 function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(2)+' MB'}
 
 async function fileToBlob(file){
