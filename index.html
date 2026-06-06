@@ -567,7 +567,9 @@ function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+'
 
 async function fileToBlob(file){
   if(isHeic(file)){
-    const c=await heic2any({blob:file,toType:'image/jpeg',quality:.95});
+    // Force correct MIME type — some systems report .HEIC as empty type
+    const blob=file.type?file:new Blob([await file.arrayBuffer()],{type:'image/heic'});
+    const c=await heic2any({blob,toType:'image/jpeg',quality:.95});
     return Array.isArray(c)?c[0]:c;
   }
   return file;
