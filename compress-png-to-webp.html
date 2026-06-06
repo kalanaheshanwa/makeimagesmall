@@ -6,147 +6,82 @@
 <meta name="description" content="Reduce PNG file size by converting to WebP free online. Shrink PNG images up to 80% smaller in your browser — no upload, no account, no limits.">
 <link rel="canonical" href="https://makeimagesmall.com/compress-png-to-webp.html">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<meta property="og:title" content="Compress PNG to WebP — Reduce PNG File Size Free"><meta property="og:type" content="website">
-<meta property="og:url" content="https://makeimagesmall.com/compress-png-to-webp.html">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does WebP keep PNG transparency?","acceptedAnswer":{"@type":"Answer","text":"Yes. WebP supports alpha transparency, so transparent backgrounds in your PNG are preserved after conversion."}},{"@type":"Question","name":"Why are my PNG files so large?","acceptedAnswer":{"@type":"Answer","text":"PNG is a lossless format, which means it stores every pixel exactly. That is great for quality but produces big files. WebP gives you near-identical quality at a fraction of the size."}},{"@type":"Question","name":"How much smaller will my PNG get?","acceptedAnswer":{"@type":"Answer","text":"Most PNGs shrink by 50–80% when converted to WebP. Graphics with flat colors and logos often compress the most."}},{"@type":"Question","name":"Is this free?","acceptedAnswer":{"@type":"Answer","text":"Completely free, with no sign-up and no limit on the number of files."}}]}</script>
+<meta property="og:title" content="Compress PNG to WebP — Reduce PNG File Size Free"><meta property="og:type" content="website"><meta property="og:url" content="https://makeimagesmall.com/compress-png-to-webp.html">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does WebP keep PNG transparency?","acceptedAnswer":{"@type":"Answer","text":"Yes. WebP supports alpha transparency, so transparent backgrounds in your PNG are preserved after conversion."}},{"@type":"Question","name":"Why are my PNG files so large?","acceptedAnswer":{"@type":"Answer","text":"PNG is lossless, storing every pixel exactly. That is great for quality but produces big files. WebP gives near-identical quality at a fraction of the size."}},{"@type":"Question","name":"How much smaller will my PNG get?","acceptedAnswer":{"@type":"Answer","text":"Most PNGs shrink by 50–80% when converted to WebP. Logos and flat-color graphics often compress the most."}},{"@type":"Question","name":"Is this free?","acceptedAnswer":{"@type":"Answer","text":"Completely free, with no sign-up and no limit on the number of files."}}]}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/mis-app.css">
 <script>(function(){var s=localStorage.getItem('mis-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',s?s:(d?'dark':'light'));})();</script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-P5ERVP0NVS"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-P5ERVP0NVS');</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--brand:#2563eb;--brand-h:#1d4ed8;--brand-light:#eff6ff;--brand-mid:#dbeafe;--green:#16a34a;--green-light:#f0fdf4;--green-mid:#dcfce7;--bg:#f8fafc;--white:#fff;--surface:#f1f5f9;--text:#0f172a;--sub:#64748b;--muted:#94a3b8;--border:#e2e8f0;--r:14px;--rs:9px}
-[data-theme="dark"]{--brand:#4f8ef7;--brand-h:#6ba3f8;--brand-light:rgba(79,142,247,.1);--brand-mid:rgba(79,142,247,.18);--green:#34d468;--green-light:rgba(52,212,104,.08);--green-mid:rgba(52,212,104,.18);--bg:#0a0a0a;--white:#161616;--surface:#111111;--text:#ededed;--sub:#a0a0a0;--muted:#555;--border:#272727}
-body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.7;transition:background .3s,color .3s}
-header{background:var(--white);border-bottom:1px solid var(--border);padding:12px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);transition:background .3s,border-color .3s}
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-size:15px;font-weight:600;color:var(--text)}
-.logo-icon{width:28px;height:28px;background:var(--brand);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logo-icon svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.header-right{display:flex;align-items:center;gap:12px}
-.nav-link{font-size:13px;color:var(--sub);text-decoration:none;font-weight:500;padding:5px 10px;border-radius:6px;transition:color .15s}
-.nav-link:hover{color:var(--text)}
-.toggle-wrap{display:flex;align-items:center;gap:7px}
-.toggle-icon{font-size:14px}
-.dark-toggle{width:38px;height:22px;border-radius:11px;background:#cbd5e1;border:none;cursor:pointer;position:relative;transition:background .3s;flex-shrink:0}
-.dark-toggle::after{content:'';width:16px;height:16px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:left .25s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
-[data-theme="dark"] .dark-toggle{background:var(--brand)}
-[data-theme="dark"] .dark-toggle::after{left:19px}
-main{max-width:760px;margin:0 auto;padding:48px 24px 80px}
-.breadcrumb{font-size:12px;color:var(--muted);margin-bottom:18px}
-.breadcrumb a{color:var(--muted);text-decoration:none}
-.breadcrumb a:hover{color:var(--sub)}
-h1{font-size:clamp(26px,4vw,40px);font-weight:700;letter-spacing:-.03em;line-height:1.15;margin-bottom:12px}
-.sub{font-size:17px;color:var(--sub);margin-bottom:8px}
-.badges{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 28px}
-.badge{font-size:12px;font-weight:500;padding:5px 11px;border-radius:100px;background:var(--green-light);color:var(--green);border:1px solid var(--green-mid)}
-/* tool */
-.mis-tool{margin:8px 0 36px}
-.mis-drop{border:2px dashed var(--border);border-radius:var(--r);background:var(--white);padding:44px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
-.mis-drop:hover,.mis-drop:focus,.mis-drop.mis-over{border-color:var(--brand);background:var(--brand-light);outline:none}
-.mis-drop svg{width:38px;height:38px;stroke:var(--brand);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;margin-bottom:12px}
-.mis-drop-title{font-size:16px;font-weight:600;color:var(--text)}
-.mis-drop-title span{color:var(--brand)}
-.mis-drop-sub{font-size:13px;color:var(--muted);margin-top:6px}
-.mis-controls{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-top:18px;padding:14px 16px;background:var(--white);border:1px solid var(--border);border-radius:var(--rs)}
-.mis-quality{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--sub);font-weight:500}
-.mis-quality b{color:var(--text);min-width:22px;display:inline-block}
-.mis-quality input[type=range]{accent-color:var(--brand);width:130px}
-.mis-actions{display:flex;gap:8px}
-.mis-btn,.mis-btn-ghost{font-family:inherit;font-size:13px;font-weight:600;border-radius:8px;padding:9px 16px;cursor:pointer;border:1px solid transparent;transition:.15s}
-.mis-btn{background:var(--brand);color:#fff}
-.mis-btn:hover{background:var(--brand-h)}
-.mis-btn-ghost{background:transparent;color:var(--sub);border-color:var(--border)}
-.mis-btn-ghost:hover{color:var(--text);border-color:var(--muted)}
-.mis-summary{margin-top:14px;padding:12px 16px;background:var(--green-light);border:1px solid var(--green-mid);border-radius:var(--rs);font-size:14px;color:var(--text)}
-.mis-list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
-.mis-item{display:flex;align-items:center;gap:14px;padding:12px 16px;background:var(--white);border:1px solid var(--border);border-radius:var(--rs)}
-.mis-meta{flex:1;min-width:0}
-.mis-name{font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mis-sizes{font-size:13px;color:var(--sub);margin-top:3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.mis-arrow{color:var(--muted)}
-.mis-new{color:var(--text);font-weight:600}
-.mis-save{font-weight:600;color:var(--green);background:var(--green-light);padding:1px 8px;border-radius:100px;font-size:12px}
-.mis-working{color:var(--muted);font-style:italic}
-.mis-dl{font-family:inherit;font-size:13px;font-weight:600;background:var(--brand-light);color:var(--brand);border:none;border-radius:8px;padding:8px 16px;cursor:pointer;transition:.15s;flex-shrink:0}
-.mis-dl:hover{background:var(--brand-mid)}
-.mis-dl:disabled{opacity:.45;cursor:default}
-/* content */
-article h2{font-size:22px;font-weight:600;margin:36px 0 12px;letter-spacing:-.01em}
-article p{margin-bottom:14px;color:var(--sub)}
-.steps{counter-reset:s;list-style:none;margin:0}
-.steps li{position:relative;padding:0 0 14px 40px;color:var(--sub)}
-.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:-2px;width:26px;height:26px;background:var(--brand-light);color:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
-.faq-item{border-top:1px solid var(--border);padding:18px 0}
-.faq-item h3{font-size:16px;font-weight:600;margin-bottom:7px}
-.faq-item p{margin:0;color:var(--sub)}
-.related{margin-top:40px;padding:24px;background:var(--white);border:1px solid var(--border);border-radius:var(--r)}
-.related h2{margin:0 0 14px;font-size:16px}
-.related a{display:inline-block;margin:0 8px 8px 0;font-size:13px;font-weight:500;color:var(--brand);text-decoration:none;padding:7px 13px;background:var(--brand-light);border-radius:100px;transition:.15s}
-.related a:hover{background:var(--brand-mid)}
-.cta-box{background:var(--brand-light);border:1px solid var(--brand-mid);border-radius:var(--r);padding:26px;margin:36px 0 0;text-align:center}
-.cta-box h2{margin:0 0 8px;font-size:19px;color:var(--brand)}
-.cta-box p{font-size:14px;color:var(--sub);margin:0 auto 16px;max-width:460px}
-.cta-btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:#fff;text-decoration:none;border-radius:8px;padding:12px 28px;font-size:15px;font-weight:600;transition:.15s}
-.cta-btn:hover{background:var(--brand-h)}
-footer{border-top:1px solid var(--border);background:var(--white);padding:18px 24px;text-align:center;font-size:12px;color:var(--sub);transition:background .3s,border-color .3s}
-footer a{color:var(--sub);text-decoration:none;margin:0 8px}
-footer a:hover{color:var(--text)}
-</style>
 </head>
 <body>
 <header>
-  <a href="/" class="logo"><div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>MakeImageSmall</a>
+  <a href="/" class="logo"><svg class="logo-svg logo-light" viewBox="0 0 937.22 404.89" xmlns="http://www.w3.org/2000/svg"><defs><style>.bl1{fill:#6cd074;}.bl2{fill:#608df0;}.bl3{fill:#4caed1;}</style></defs><rect class="bl1" x="8.16" y="3.77" width="59.02" height="59.02"/><rect class="bl1" x="117.89" y="115.99" width="171.25" height="171.25"/><polygon class="bl2" points="336.52 3.77 117.89 3.77 117.89 62.79 336.52 62.79 336.52 281.42 395.55 281.42 395.55 62.79 395.55 3.77 336.52 3.77"/><polygon class="bl2" points="67.18 342.11 67.18 123.47 8.16 123.47 8.16 342.11 8.16 401.13 67.18 401.13 285.81 401.13 285.81 342.11 67.18 342.11"/><path d="M526,93.33H506.67L490,53.62l-3.64,40.6H457.13l9-89.1h28l22.25,50.66L538.58,5.12h28l9,89.1H546.27l-3.64-40.6Z"/><path d="M609.8,94.22H579.43l37.93-89.1h26l38.91,89.1H651.08l-6.3-14.89h-29.1Zm20.71-60.84L620.29,58.45h19.6Z"/><path d="M719,52.09V94.22H689.56V5.12H719V43.3L742.32,5.12H771.7V8.81L746.38,47.25l8.81,18.2c2.1,4.2,3.78,6.75,5.32,7.77a9.6,9.6,0,0,0,5.88,1.65,13.8,13.8,0,0,0,7-2.29l8.54,18.2c-4.9,1.91-8.54,3.19-11.06,4a42.65,42.65,0,0,1-9.79.89c-15,0-25.47-6.36-31.35-19.09Z"/><path d="M859.16,94.22H787.93V5.12h71.23V28H817.32V39.61h36.52V60H817.32V71.31h41.84Z"/><path d="M490.44,157.87V247H461.05v-89.1Z"/><path d="M572.44,246.08H553.13l-16.65-39.71L532.84,247H503.59l9-89.1h28l22.25,50.66L585,157.87h28l9,89.1H592.73l-3.64-40.6Z"/><path d="M656.26,247H625.89l37.92-89.1h26l38.9,89.1h-31.2l-6.3-14.89H662.13ZM677,186.13l-10.22,25.08h19.59Z"/><path d="M804.31,184.85c-4.76-3.69-10.92-5.47-18.62-5.47-7.41,0-13.57,2.17-18.19,6.62a22.78,22.78,0,0,0,0,32.84c4.62,4.46,10.78,6.62,18.19,6.62a43,43,0,0,0,11.76-1.4v-9.8H777.16V195h48.28v39c-11.9,9.55-25.19,14.38-39.75,14.38-16.09,0-29.24-4.45-39.32-13.49s-15.25-19.73-15.25-32.46,5-23.55,15.25-32.59,23.23-13.36,39.32-13.36a58.74,58.74,0,0,1,35,11.07Z"/><path d="M910,247H838.73v-89.1H910v22.91H868.11v11.59h36.53v20.36H868.11v11.33H910Z"/><path class="bl3" d="M478.68,368.29c2,8.27,7.7,12.47,17.36,12.47,7.69,0,11.47-2.16,11.47-6.36,0-3.06-2.8-5.35-8.26-7l-11.05-3.81c-8.54-2.55-14.83-5.35-19-8.53-6.44-4.71-9.66-10.57-9.8-17.57,0-8.53,3.5-15.27,10.64-20.49s15.95-7.77,26.73-7.77c18,0,30.08,7.77,35.82,23.17l-23.51,6.11c-2.24-5.73-5.18-8.91-11.75-8.91-5.18,0-9.24,2-9.24,5.6,0,2.8,2.66,5.09,8,6.75L507,345.37c21.13,6.62,28.69,14.9,29.11,28.13,0,9-3.78,15.79-11.48,20.5s-17.21,7.13-28.54,7.13c-23,0-38.07-10.06-41-27.88Z"/><path class="bl3" d="M613.16,398.84H593.85L577.2,359.12l-3.64,40.61H544.31l9-89.11h28l22.25,50.66,22.25-50.66h28l9,89.11H633.45l-3.64-40.61Z"/><path class="bl3" d="M697,399.73H666.61l37.92-89.11h26l38.9,89.11h-31.2l-6.3-14.9h-29.1Zm20.71-60.85L707.47,364h19.59Z"/><path class="bl3" d="M806.26,310.62v66.19H850.2v22.92H776.88V310.62Z"/><path class="bl3" d="M890.64,310.62v66.19h43.94v22.92H861.26V310.62Z"/></svg><svg class="logo-svg logo-dark" viewBox="0 0 937.22 404.89" xmlns="http://www.w3.org/2000/svg"><defs><style>.wh1{fill:#6cd074;}.wh2{fill:#608df0;}.wh3{fill:#fff;}.wh4{fill:#4caed1;}</style></defs><rect class="wh1" x="8.16" y="3.77" width="59.02" height="59.02"/><rect class="wh1" x="117.89" y="115.99" width="171.25" height="171.25"/><polygon class="wh2" points="336.52 3.77 117.89 3.77 117.89 62.79 336.52 62.79 336.52 281.42 395.55 281.42 395.55 62.79 395.55 3.77 336.52 3.77"/><polygon class="wh2" points="67.18 342.11 67.18 123.47 8.16 123.47 8.16 342.11 8.16 401.13 67.18 401.13 285.81 401.13 285.81 342.11 67.18 342.11"/><path class="wh3" d="M526,93.33H506.67L490,53.62l-3.64,40.6H457.13l9-89.1h28l22.25,50.66L538.58,5.12h28l9,89.1H546.27l-3.64-40.6Z"/><path class="wh3" d="M609.8,94.22H579.43l37.93-89.1h26l38.91,89.1H651.08l-6.3-14.89h-29.1Zm20.71-60.84L620.29,58.45h19.6Z"/><path class="wh3" d="M719,52.09V94.22H689.56V5.12H719V43.3L742.32,5.12H771.7V8.81L746.38,47.25l8.81,18.2c2.1,4.2,3.78,6.75,5.32,7.77a9.6,9.6,0,0,0,5.88,1.65,13.8,13.8,0,0,0,7-2.29l8.54,18.2c-4.9,1.91-8.54,3.19-11.06,4a42.65,42.65,0,0,1-9.79.89c-15,0-25.47-6.36-31.35-19.09Z"/><path class="wh3" d="M859.16,94.22H787.93V5.12h71.23V28H817.32V39.61h36.52V60H817.32V71.31h41.84Z"/><path class="wh3" d="M490.44,157.87V247H461.05v-89.1Z"/><path class="wh3" d="M572.44,246.08H553.13l-16.65-39.71L532.84,247H503.59l9-89.1h28l22.25,50.66L585,157.87h28l9,89.1H592.73l-3.64-40.6Z"/><path class="wh3" d="M656.26,247H625.89l37.92-89.1h26l38.9,89.1h-31.2l-6.3-14.89H662.13ZM677,186.13l-10.22,25.08h19.59Z"/><path class="wh3" d="M804.31,184.85c-4.76-3.69-10.92-5.47-18.62-5.47-7.41,0-13.57,2.17-18.19,6.62a22.78,22.78,0,0,0,0,32.84c4.62,4.46,10.78,6.62,18.19,6.62a43,43,0,0,0,11.76-1.4v-9.8H777.16V195h48.28v39c-11.9,9.55-25.19,14.38-39.75,14.38-16.09,0-29.24-4.45-39.32-13.49s-15.25-19.73-15.25-32.46,5-23.55,15.25-32.59,23.23-13.36,39.32-13.36a58.74,58.74,0,0,1,35,11.07Z"/><path class="wh3" d="M910,247H838.73v-89.1H910v22.91H868.11v11.59h36.53v20.36H868.11v11.33H910Z"/><path class="wh4" d="M478.68,368.29c2,8.27,7.7,12.47,17.36,12.47,7.69,0,11.47-2.16,11.47-6.36,0-3.06-2.8-5.35-8.26-7l-11.05-3.81c-8.54-2.55-14.83-5.35-19-8.53-6.44-4.71-9.66-10.57-9.8-17.57,0-8.53,3.5-15.27,10.64-20.49s15.95-7.77,26.73-7.77c18,0,30.08,7.77,35.82,23.17l-23.51,6.11c-2.24-5.73-5.18-8.91-11.75-8.91-5.18,0-9.24,2-9.24,5.6,0,2.8,2.66,5.09,8,6.75L507,345.37c21.13,6.62,28.69,14.9,29.11,28.13,0,9-3.78,15.79-11.48,20.5s-17.21,7.13-28.54,7.13c-23,0-38.07-10.06-41-27.88Z"/><path class="wh4" d="M613.16,398.84H593.85L577.2,359.12l-3.64,40.61H544.31l9-89.11h28l22.25,50.66,22.25-50.66h28l9,89.11H633.45l-3.64-40.61Z"/><path class="wh4" d="M697,399.73H666.61l37.92-89.11h26l38.9,89.11h-31.2l-6.3-14.9h-29.1Zm20.71-60.85L707.47,364h19.59Z"/><path class="wh4" d="M806.26,310.62v66.19H850.2v22.92H776.88V310.62Z"/><path class="wh4" d="M890.64,310.62v66.19h43.94v22.92H861.26V310.62Z"/></svg></a>
   <div class="header-right">
     <a href="/" class="nav-link">Tool</a>
+    <a href="/tools.html" class="nav-link">Tools</a>
     <a href="/blog/" class="nav-link">Blog</a>
-    <a href="/about.html" class="nav-link">About</a>
     <div class="toggle-wrap"><span class="toggle-icon" id="themeIcon">🌙</span><button class="dark-toggle" onclick="toggleDark()" aria-label="Toggle dark mode"></button></div>
   </div>
 </header>
-<main>
-  <div class="breadcrumb"><a href="/">Home</a> / Compress PNG to WebP</div>
-  <h1>Compress PNG to WebP</h1>
-  <p class="sub">PNG files are often huge because the format is lossless. Converting a PNG to WebP usually cuts the file size by 50–80% while keeping the image looking identical — and WebP even supports transparency, just like PNG.</p>
-  <div class="badges"><span class="badge">No upload</span><span class="badge">No account</span><span class="badge">100% free</span><span class="badge">Private — runs in your browser</span></div>
-
-  <div class="mis-tool">
-    <div class="mis-drop" id="mis-drop" tabindex="0" role="button" aria-label="Add images">
-      <input type="file" id="mis-input" accept="image/*,.heic,.heif" multiple hidden>
-      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      <p class="mis-drop-title">Drop images here or <span>browse</span></p>
-      <p class="mis-drop-sub">JPG, PNG, GIF, HEIC and more · Files never leave your device</p>
-    </div>
-    <div class="mis-controls" id="mis-controls" hidden>
-      <div class="mis-quality"><label for="mis-q">Quality <b id="mis-qval">85</b></label><input type="range" id="mis-q" min="40" max="95" value="85"></div>
-      <div class="mis-actions"><button class="mis-btn-ghost" id="mis-clear">Clear all</button><button class="mis-btn" id="mis-all">Download all (.zip)</button></div>
-    </div>
-    <div class="mis-summary" id="mis-summary" hidden></div>
-    <div class="mis-list" id="mis-list"></div>
+<main class="lp-narrow">
+  <div class="breadcrumb"><a href="/">Home</a> / <a href="/tools.html">Tools</a> / Compress PNG to WebP</div>
+  <div class="hero">
+    <h1>Compress PNG to WebP</h1>
+    <p class="hero-sub">PNG files are often huge because the format is lossless. Converting a PNG to WebP usually cuts the size by 50–80% while keeping the image looking identical — and WebP supports transparency, just like PNG.</p>
+    <div class="badges"><span class="badge">No upload</span><span class="badge">No account</span><span class="badge">100% free</span><span class="badge">Private — runs in your browser</span></div>
   </div>
 
+  <div class="drop-zone" id="dropZone">
+    <input type="file" id="fileInput" multiple accept="image/*,.heic,.heif,.HEIC,.HEIF">
+    <div class="dz-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+    <div class="dz-title" id="dzTitle">Drop your images here</div>
+    <div class="dz-sub">or click to select files from your device</div>
+    <button class="btn-pick" onclick="document.getElementById('fileInput').click();event.stopPropagation()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Select images</button>
+    <div class="formats">JPG · PNG · GIF · BMP · AVIF · TIFF · WebP · <strong style="color:var(--brand)">HEIC/HEIF</strong></div>
+    <div id="heicNotice" style="display:none;margin-top:12px;font-size:12px;color:var(--brand);background:var(--brand-light);border:1px solid var(--brand-mid);border-radius:var(--rs);padding:7px 14px;max-width:420px;margin-left:auto;margin-right:auto"><strong>ℹ️ HEIC detected</strong> — We'll convert your iPhone photos to WebP. This may take a few seconds per file.</div>
+  </div>
+
+  <div class="controls">
+    <span class="ctrl-label">Quality</span>
+    <div class="quality-wrap"><input type="range" id="qualitySlider" min="10" max="90" value="82" step="1"><span class="quality-num" id="qualityNum">82</span></div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px"><span class="ctrl-desc" id="ctrlDesc">Higher = better quality, larger file. 80–85 is the sweet spot.</span><button id="recompressBtn" onclick="recompressAll()" style="display:none;padding:6px 14px;background:var(--brand);color:white;border:none;border-radius:var(--rs);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;">↺ Recompress all</button></div>
+  </div>
+
+  <div class="done-banner" id="doneBanner"><div class="done-banner-icon">✅</div><div class="done-banner-text"><div class="done-banner-title" id="doneBannerTitle">Compression complete!</div><div class="done-banner-sub" id="doneBannerSub">Your images are ready to download</div></div></div>
+
+  <div id="progressWrap"><div class="prog-head"><span id="progText">Compressing…</span><span id="progCount">0 / 0</span></div><div class="prog-track"><div class="prog-fill" id="progFill"></div></div></div>
+
+  <div class="results-bar" id="resultsBar"><div><div class="results-title">Compressed images</div><div class="results-meta" id="resultsMeta"></div></div><div style="display:flex;gap:8px"><button class="btn-clear" onclick="clearAll()">Clear all</button><button class="btn-dlall" id="dlAllBtn" onclick="downloadAll()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download all</button></div></div>
+  <div id="summaryStrip"><div class="sum-item"><div class="sum-val" id="scFiles">0</div><div class="sum-lbl">Files</div></div><div class="sum-item"><div class="sum-val" id="scBefore">—</div><div class="sum-lbl">Original</div></div><div class="sum-item"><div class="sum-val" id="scAfter">—</div><div class="sum-lbl">Compressed</div></div><div class="sum-item"><div class="sum-val" id="scPct">0%</div><div class="sum-lbl">Saved</div></div></div>
+  <div id="fileList"></div>
   <article>
     <p>Drop your PNG files below to shrink them instantly. Everything happens in your browser, so there are no uploads and no waiting.</p>
     <h2>How to compress png to webp</h2>
-    <ol class="steps"><li>Drop your PNG files into the box above.</li><li>Each PNG is re-encoded to WebP, transparency included.</li><li>Adjust the quality slider if you want even smaller files.</li><li>Download your compressed WebP images individually or as a ZIP.</li></ol>
-    <h2>Frequently asked questions</h2>
-    <div class="faq-item"><h3>Does WebP keep PNG transparency?</h3><p>Yes. WebP supports alpha transparency, so transparent backgrounds in your PNG are preserved after conversion.</p></div><div class="faq-item"><h3>Why are my PNG files so large?</h3><p>PNG is a lossless format, which means it stores every pixel exactly. That is great for quality but produces big files. WebP gives you near-identical quality at a fraction of the size.</p></div><div class="faq-item"><h3>How much smaller will my PNG get?</h3><p>Most PNGs shrink by 50–80% when converted to WebP. Graphics with flat colors and logos often compress the most.</p></div><div class="faq-item"><h3>Is this free?</h3><p>Completely free, with no sign-up and no limit on the number of files.</p></div>
+    <ol class="steps"><li>Drop your PNG files into the box above.</li><li>Each PNG is re-encoded to WebP, transparency included.</li><li>Adjust the quality slider for even smaller files.</li><li>Download your compressed WebP images individually or as a ZIP.</li></ol>
   </article>
-
-  <div class="related"><h2>Related free tools</h2><a href="/compress-jpg-to-webp.html">Compress JPG to WebP</a><a href="/heic-to-webp.html">HEIC to WebP Converter</a><a href="/compress-image-to-100kb.html">Compress Image to Under 100KB</a><a href="/compress-image-for-email.html">Compress Images for Email</a><a href="/bulk-image-compressor.html">Bulk Image Compressor</a></div>
-
-  <div class="cta-box">
-    <h2>Need the full toolkit?</h2>
-    <p>The MakeImageSmall homepage handles every format with batch upload, per-image quality, and before/after preview — all free, all in your browser.</p>
-    <a href="https://makeimagesmall.com" class="cta-btn">Open the full compressor</a>
+  <div class="faq">
+    <h2>Frequently asked questions</h2>
+    <div class="faq-item"><div class="faq-q">Does WebP keep PNG transparency?</div><div class="faq-a">Yes. WebP supports alpha transparency, so transparent backgrounds in your PNG are preserved after conversion.</div></div><div class="faq-item"><div class="faq-q">Why are my PNG files so large?</div><div class="faq-a">PNG is lossless, storing every pixel exactly. That is great for quality but produces big files. WebP gives near-identical quality at a fraction of the size.</div></div><div class="faq-item"><div class="faq-q">How much smaller will my PNG get?</div><div class="faq-a">Most PNGs shrink by 50–80% when converted to WebP. Logos and flat-color graphics often compress the most.</div></div><div class="faq-item"><div class="faq-q">Is this free?</div><div class="faq-a">Completely free, with no sign-up and no limit on the number of files.</div></div>
   </div>
+  <div class="related"><h2>Related free tools</h2><a href="/compress-jpg-to-webp.html">Compress JPG to WebP</a><a href="/heic-to-webp.html">HEIC to WebP Converter</a><a href="/compress-image-to-100kb.html">Compress Image to Under 100KB</a><a href="/compress-image-for-email.html">Compress Images for Email</a><a href="/bulk-image-compressor.html">Bulk Image Compressor</a></div>
+  <div class="cta-box"><h2>Need the full toolkit?</h2><p>The MakeImageSmall homepage handles every format with batch upload, per-image quality, and before/after preview — all free, all in your browser.</p><a href="https://makeimagesmall.com" class="cta-btn">Open the full compressor</a></div>
 </main>
-<footer>
-  <div style="margin-bottom:8px"><a href="/">Home</a><a href="/blog/">Blog</a><a href="/about.html">About</a><a href="/contact.html">Contact</a><a href="/privacy.html">Privacy</a></div>
-  &copy; 2026 MakeImageSmall — Free Image Compressor
-</footer>
-<script>window.MIS_CFG={"quality":85};</script>
-<script src="/assets/mis-compress.js" defer></script>
+<footer><div style="margin-bottom:8px"><a href="/">Home</a><a href="/tools.html">Tools</a><a href="/blog/">Blog</a><a href="/about.html">About</a><a href="/contact.html">Contact</a><a href="/privacy.html">Privacy</a></div>&copy; 2026 MakeImageSmall — Free Image Compressor — No uploads · No tracking · All processing in your browser</footer>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header"><div class="modal-title" id="modalTitle"></div><div class="modal-meta" id="modalMeta"></div><button class="modal-close" onclick="closeModalDirect()">✕</button></div>
+    <div class="modal-body"><div class="compare-wrap" id="compareWrap"><div class="compare-img" id="imgAfter"><img id="afterImg" alt="Compressed"></div><div class="compare-img compare-before" id="imgBefore"><img id="beforeImg" alt="Original"></div><div class="compare-divider" id="divider"></div><div class="compare-handle" id="handle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/><polyline points="9 18 3 12 9 6" transform="translate(6,0)"/></svg></div><div class="compare-label label-before">Original</div><div class="compare-label label-after">Compressed</div></div></div>
+    <div class="modal-quality" id="modalQualityRow"><span class="modal-quality-label">Quality</span><input type="range" id="modalQualitySlider" min="10" max="90" value="82" step="1"><span class="modal-quality-num" id="modalQualityNum">82</span><span class="modal-quality-info" id="modalQualityInfo">Drag to adjust — click Recompress to apply</span><button class="btn-recompress" id="modalRecompressBtn" onclick="recompressSingle()">↺ Recompress</button></div>
+    <div class="modal-footer"><span class="modal-hint">← Drag slider to compare original vs compressed →</span><button class="btn-dlall" id="modalDlBtn" style="padding:8px 18px;font-size:13px;">↓ Download</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="/assets/mis-app.js"></script>
 <script>
 function toggleDark(){var h=document.documentElement;var d=h.getAttribute('data-theme')==='dark';h.setAttribute('data-theme',d?'light':'dark');document.getElementById('themeIcon').textContent=d?'🌙':'☀️';localStorage.setItem('mis-theme',d?'light':'dark');}
 (function(){var d=document.documentElement.getAttribute('data-theme')==='dark';var i=document.getElementById('themeIcon');if(i)i.textContent=d?'☀️':'🌙';})();
