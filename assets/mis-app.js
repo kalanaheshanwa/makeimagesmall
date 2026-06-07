@@ -38,20 +38,25 @@ dropZone.addEventListener('click',e=>{if(!e.target.closest('button'))fileInput.c
 fileInput.addEventListener('change',()=>{if(fileInput.files.length)handleFiles([...fileInput.files])});
 
 function isImageFile(f){
-  if(f.type.startsWith('image/'))return true;
+  if((f.type||'').startsWith('image/'))return true;
   const ext=f.name.split('.').pop().toLowerCase();
   return['heic','heif','jpg','jpeg','png','gif','bmp','webp','avif','tiff','tif'].includes(ext);
 }
 function isHeic(f){
   const ext=f.name.split('.').pop().toLowerCase();
-  const type=f.type.toLowerCase();
+  const type=(f.type||'').toLowerCase();
   return type==='image/heic'||type==='image/heif'||ext==='heic'||ext==='heif';
 }
 function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(2)+' MB'}
 
 async function fileToBlob(file){
   if(isHeic(file)){
-    const c=await heic2any({blob:file,toType:'image/jpeg',quality:.95});
+    // Always wrap in a typed Blob — handles both .heic (may report image/heic)
+    // and .HEIC (often reports empty string type on Windows/Android).
+    // heic2any requires a valid MIME type to process the file correctly.
+    const buf=await file.arrayBuffer();
+    const blob=new Blob([buf],{type:'image/heic'});
+    const c=await heic2any({blob,toType:'image/jpeg',quality:.95});
     return Array.isArray(c)?c[0]:c;
   }
   return file;
