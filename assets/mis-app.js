@@ -51,12 +51,11 @@ function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+'
 
 async function fileToBlob(file){
   if(isHeic(file)){
-    // Always wrap in a typed Blob — handles both .heic (may report image/heic)
-    // and .HEIC (often reports empty string type on Windows/Android).
-    // heic2any requires a valid MIME type to process the file correctly.
-    const buf=await file.arrayBuffer();
-    const blob=new Blob([buf],{type:'image/heic'});
-    const c=await heic2any({blob,toType:'image/jpeg',quality:.95});
+    // Use File constructor to guarantee correct MIME type for heic2any.
+    // new File([file], ...) references the original data without reading bytes —
+    // this works for both .heic (correct type) and .HEIC (empty type on Windows/Android).
+    const typed=new File([file],file.name,{type:'image/heic'});
+    const c=await heic2any({blob:typed,toType:'image/jpeg',quality:.95});
     return Array.isArray(c)?c[0]:c;
   }
   return file;
