@@ -560,15 +560,17 @@ function isImageFile(f){
 }
 function isHeic(f){
   const ext=f.name.split('.').pop().toLowerCase();
-  const type=f.type.toLowerCase();
+  const type=(f.type||'').toLowerCase();
   return type==='image/heic'||type==='image/heif'||ext==='heic'||ext==='heif';
 }
 function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(2)+' MB'}
 
 async function fileToBlob(file){
   if(isHeic(file)){
-    // Force correct MIME type — some systems report .HEIC as empty type
-    const blob=file.type?file:new Blob([await file.arrayBuffer()],{type:'image/heic'});
+    // Wrap in a typed Blob so heic2any always gets a valid MIME type
+    // Handles both .heic (may have image/heic type) and .HEIC (often has empty type)
+    const buf=await file.arrayBuffer();
+    const blob=new Blob([buf],{type:'image/heic'});
     const c=await heic2any({blob,toType:'image/jpeg',quality:.95});
     return Array.isArray(c)?c[0]:c;
   }
