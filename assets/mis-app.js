@@ -1,6 +1,6 @@
 // MakeImageSmall — shared compressor tool (extracted from the homepage).
 // Used by the homepage and every landing page so the tool is identical everywhere.
-// Requires heic2any and JSZip to be loaded before this file.
+// Requires heic-to (IIFE build, exposes global `HeicTo`) and JSZip to be loaded before this file.
 
 // ── TOOL ──
 const dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput');
@@ -51,12 +51,10 @@ function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+'
 
 async function fileToBlob(file){
   if(isHeic(file)){
-    // Use File constructor to guarantee correct MIME type for heic2any.
-    // new File([file], ...) references the original data without reading bytes —
-    // this works for both .heic (correct type) and .HEIC (empty type on Windows/Android).
-    const typed=new File([file],file.name,{type:'image/heic'});
-    const c=await heic2any({blob:typed,toType:'image/jpeg',quality:.95});
-    return Array.isArray(c)?c[0]:c;
+    // heic-to (libheif 1.21.x) decodes by file content — it ignores the filename,
+    // the extension case, and the MIME type, so .heic and .HEIC are handled identically.
+    const out=await HeicTo({blob:file,type:'image/jpeg',quality:.95});
+    return Array.isArray(out)?out[0]:out;
   }
   return file;
 }
@@ -109,7 +107,8 @@ function handleFiles(files){
       totalBefore+=file.size;totalAfter+=final.size;doneCount++;done++;
       tick(done,total);cardDone(id,file,final,url,outName,useOrig);updateSummary();updateMeta();
     }catch(err){
-      cardError(id,isHeic(file)&&err.message?.includes('heic2any')?'HEIC not supported on this browser':'Could not process image');
+      console.error('[MIS] Error processing file:',file.name,'| type:',file.type,'| error:',err);
+      cardError(id,isHeic(file)?'This HEIC file could not be decoded — try exporting it as JPEG':'Could not process image');
       done++;tick(done,total);
     }
   });
