@@ -15,6 +15,18 @@ qualitySlider.addEventListener('input',()=>{
     document.getElementById('ctrlDesc').style.color='var(--warn)';
   }
 });
+// Max-dimension control — mirrors the quality slider's "recompress to apply" prompt.
+// Guarded so pages without the select (e.g. landing pages) don't throw on load.
+const maxDimSelect=document.getElementById('maxDimSelect');
+if(maxDimSelect){
+  maxDimSelect.addEventListener('change',()=>{
+    if(originalFiles.length){
+      document.getElementById('recompressBtn').style.display='inline-flex';
+      document.getElementById('ctrlDesc').textContent='Size limit changed — click Recompress to apply.';
+      document.getElementById('ctrlDesc').style.color='var(--warn)';
+    }
+  });
+}
 function resetQualityDesc(){
   document.getElementById('recompressBtn').style.display='none';
   document.getElementById('ctrlDesc').textContent='Higher = better quality, larger file. 80–85 is the sweet spot.';
@@ -48,6 +60,17 @@ function isHeic(f){
   return type==='image/heic'||type==='image/heif'||ext==='heic'||ext==='heif';
 }
 function fmt(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(2)+' MB'}
+
+// Selected max dimension (longest side) in px; 0 = keep original. Reads the select live each call.
+function maxDimValue(){const el=document.getElementById('maxDimSelect');return el?(parseInt(el.value,10)||0):0;}
+// Scale (w,h) to honour the user's max-dimension cap, then the hard 16383 canvas safety cap.
+function fitDimensions(w,h){
+  const maxDim=maxDimValue();
+  if(maxDim&&Math.max(w,h)>maxDim){const s=maxDim/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}
+  const M=16383;
+  if(w>M||h>M){const s=Math.min(M/w,M/h);w=Math.floor(w*s);h=Math.floor(h*s);}
+  return [w,h];
+}
 
 async function fileToBlob(file){
   if(isHeic(file)){
@@ -94,8 +117,8 @@ function handleFiles(files){
       await new Promise((r,j)=>{img.onload=r;img.onerror=j;img.src=bUrl});
       URL.revokeObjectURL(bUrl);
       const c=document.createElement('canvas');
-      const M=16383;let w=img.naturalWidth,h=img.naturalHeight;
-      if(w>M||h>M){const s=Math.min(M/w,M/h);w=Math.floor(w*s);h=Math.floor(h*s)}
+      let w=img.naturalWidth,h=img.naturalHeight;
+      [w,h]=fitDimensions(w,h);
       c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
       const blob=await new Promise(r=>c.toBlob(r,'image/webp',parseInt(qualitySlider.value)/100));
       if(!blob)throw new Error('Encoding failed');
@@ -179,7 +202,20 @@ async function downloadAll(){
   const z=await zip.generateAsync({type:'blob'});dl(URL.createObjectURL(z),'compressed-images.zip');
   btn.disabled=false;resetDlBtn();
 }
-function resetDlBtn(){document.getElementById('dlAllBtn').innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" stroke="white" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download all'}
+function resetDlBtn(){document.getElementById('dlAllBtn').innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" stroke="white" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download all (ZIP)'}
+// Download each file individually (no ZIP) — better on Windows. Sequential <a download> with a
+// small gap so the browser doesn't throttle or drop rapid downloads. Guarded for shared use.
+async function downloadEach(){
+  if(!results.length)return;
+  const btn=document.getElementById('dlEachBtn');
+  if(btn){btn.disabled=true;btn.textContent='Downloading…';}
+  for(let i=0;i<results.length;i++){
+    dl(results[i].url,results[i].name);
+    if(i<results.length-1)await new Promise(r=>setTimeout(r,300));
+  }
+  if(btn){btn.disabled=false;resetEachBtn();}
+}
+function resetEachBtn(){const b=document.getElementById('dlEachBtn');if(b)b.innerHTML='<svg viewBox="0 0 24 24" width="14" height="14" stroke="white" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download all (files)';}
 function clearAll(){
   results.forEach(f=>URL.revokeObjectURL(f.url));
   Object.values(previewData).forEach(d=>{if(d.origUrl)URL.revokeObjectURL(d.origUrl)});
@@ -260,8 +296,8 @@ async function recompressSingle(){
     await new Promise((r,j)=>{img.onload=r;img.onerror=j;img.src=bUrl});
     URL.revokeObjectURL(bUrl);
     const canvas=document.createElement('canvas');
-    const M=16383;let w=img.naturalWidth,h=img.naturalHeight;
-    if(w>M||h>M){const s=Math.min(M/w,M/h);w=Math.floor(w*s);h=Math.floor(h*s)}
+    let w=img.naturalWidth,h=img.naturalHeight;
+    [w,h]=fitDimensions(w,h);
     canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);
     const blob=await new Promise(r=>canvas.toBlob(r,'image/webp',q));
     if(!blob)throw new Error('Failed');
