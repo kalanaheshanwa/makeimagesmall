@@ -46,6 +46,8 @@
   <div class="controls">
     <span class="ctrl-label">Quality</span>
     <div class="quality-wrap"><input type="range" id="qualitySlider" min="10" max="90" value="82" step="1"><span class="quality-num" id="qualityNum">82</span></div>
+    <span class="ctrl-label">Max size</span>
+    <select id="maxDimSelect" class="dim-select" aria-label="Maximum image dimension"><option value="0">Original</option><option value="2500">Max 2500px</option><option value="1920">Max 1920px</option><option value="1200">Max 1200px</option></select>
     <div style="flex:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px"><span class="ctrl-desc" id="ctrlDesc">Higher = better quality, larger file. 80–85 is the sweet spot.</span><button id="recompressBtn" onclick="recompressAll()" style="display:none;padding:6px 14px;background:var(--brand);color:white;border:none;border-radius:var(--rs);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;">↺ Recompress all</button></div>
   </div>
 
@@ -53,7 +55,7 @@
 
   <div id="progressWrap"><div class="prog-head"><span id="progText">Compressing…</span><span id="progCount">0 / 0</span></div><div class="prog-track"><div class="prog-fill" id="progFill"></div></div></div>
 
-  <div class="results-bar" id="resultsBar"><div><div class="results-title">Compressed images</div><div class="results-meta" id="resultsMeta"></div></div><div style="display:flex;gap:8px"><button class="btn-clear" onclick="clearAll()">Clear all</button><button class="btn-dlall" id="dlAllBtn" onclick="downloadAll()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download all</button></div></div>
+  <div class="results-bar" id="resultsBar"><div><div class="results-title">Compressed images</div><div class="results-meta" id="resultsMeta"></div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-clear" onclick="clearAll()">Clear all</button><button class="btn-dlall btn-dlall-files" id="dlEachBtn" onclick="downloadEach()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download all (files)</button><button class="btn-dlall" id="dlAllBtn" onclick="downloadAll()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download all (ZIP)</button></div></div>
   <div id="summaryStrip"><div class="sum-item"><div class="sum-val" id="scFiles">0</div><div class="sum-lbl">Files</div></div><div class="sum-item"><div class="sum-val" id="scBefore">—</div><div class="sum-lbl">Original</div></div><div class="sum-item"><div class="sum-val" id="scAfter">—</div><div class="sum-lbl">Compressed</div></div><div class="sum-item"><div class="sum-val" id="scPct">0%</div><div class="sum-lbl">Saved</div></div></div>
   <div id="fileList"></div>
   <article>
